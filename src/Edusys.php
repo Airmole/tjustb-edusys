@@ -82,6 +82,23 @@ class Edusys
     }
 
     /**
+     * 修改密码
+     * @param string $nowPwd 现密码
+     * @param string $newPwd 新密码
+     * @param string $repeatNewpwd 新密码重复
+     * @return array
+     * @throws Exception
+     */
+    public function changePassword(string $nowPwd, string $newPwd, string $repeatNewpwd): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $login = new Login();
+        $result = $login->changePassword($this->cookie, $nowPwd, $newPwd, $repeatNewpwd);
+        if ($result['code'] !== Base::CODE_SUCCESS) throw new Exception($result['data']);
+        return $result;
+    }
+
+    /**
      * 获取资料信息
      * @return array
      * @throws Exception
@@ -90,7 +107,44 @@ class Edusys
     {
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
         $profile = new Profile($this->usercode, $this->cookie);
-        return $profile->getProfile();
+        $profile = $profile->getProfile();
+        if ($profile['code'] !== Base::CODE_SUCCESS) throw new Exception('获取失败');
+        return $profile['data'];
+    }
+
+    /**
+     * 获取学籍照片(base64)
+     * @return string
+     * @throws Exception
+     */
+    public function photo(): string
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $profile = new Profile($this->usercode, $this->cookie);
+        return $profile->photo();
+    }
+
+    /**
+     * 获取成绩
+     * @param string $time 开课学期
+     * @param string $nature 课程性质
+     * @param string $course 课程名称
+     * @param string $show 显示方式：all-显示全部成绩,max-显示最好成绩
+     * @param bool $classify 是否按学期分类计算平均分
+     * @return array
+     * @throws Exception
+     */
+    public function score(
+        string $time = '',
+        string $nature = '',
+        string $course = '',
+        string $show = 'all',
+        bool   $classify = true
+    ): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $score = new Score($this->usercode, $this->cookie);
+        return $score->score($time, $nature, $course, $show, $classify);
     }
 
 }

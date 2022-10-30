@@ -11,6 +11,11 @@ use Airmole\TjustbEdusys\Exception\Exception;
 class Base
 {
     /**
+     * 状态码 成功
+     */
+    public const CODE_SUCCESS = 200;
+
+    /**
      * @var string 教务URL域名
      */
     public string $edusysUrl;
@@ -24,16 +29,11 @@ class Base
      * @var string 账号
      */
     public string $usercode;
-
+    
     /**
      * @var string 可用cookie值（仅登录成功后赋值）
      */
     public string $cookie;
-
-    /**
-     * 状态码 成功
-     */
-    public const CODE_SUCCESS = 200;
 
     /**
      * @throws Exception
@@ -239,15 +239,15 @@ class Base
     public function stripHtmlTagAndBlankspace(string $html): string
     {
         $str = trim($html);
-        $str = preg_replace("/\r\n/","",$str);
-        $str = preg_replace("/\r/","",$str);
-        $str = preg_replace("/\n/","",$str);
-        $str = preg_replace("/\t/","",$str);
-        $str = preg_replace("/ /","",$str);
+        $str = preg_replace("/\r\n/", "", $str);
+        $str = preg_replace("/\r/", "", $str);
+        $str = preg_replace("/\n/", "", $str);
+        $str = preg_replace("/\t/", "", $str);
+        $str = preg_replace("/ /", "", $str);
         $str = trim($str);
         $str = strip_tags($str);
-        $str = preg_replace("/&nbsp;/","",$str);
-        return preg_replace("/&nbsp/","",$str);
+        $str = preg_replace("/&nbsp;/", "", $str);
+        return preg_replace("/&nbsp/", "", $str);
     }
 
     /**
