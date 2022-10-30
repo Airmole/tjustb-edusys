@@ -159,4 +159,28 @@ class Login extends Base
         return $this->httpGet($url, $cookie, $referer);
     }
 
+    /**
+     * 修改密码
+     * @param string $cookie
+     * @param string $nowPwd
+     * @param string $newPwd
+     * @param string $repeatNewpwd
+     * @return array
+     * @throws Exception
+     */
+    public function changePassword(string $cookie, string $nowPwd, string $newPwd, string $repeatNewpwd): array
+    {
+        $nowPwd = trim($nowPwd);
+        $newPwd = trim($newPwd);
+        $repeatNewpwd = trim($repeatNewpwd);
+        if ($newPwd !== $repeatNewpwd) throw new Exception('重复密码不一致');
+        if ($nowPwd === $newPwd) throw new Exception('新旧密码不得相同');
+        if (strlen($newPwd) < 8 || strlen($repeatNewpwd) < 8) throw new Exception('新秘密不得少于8位');
+        preg_match('/^(?=.*\d)(?=.*[a-z])[a-zA-Z0-9]{8,32}$/', $newPwd, $match);
+        if (empty($match)) throw new Exception('8位以上且同时包含字母数字');
+        $url = $this->edusysUrl . '/jsxsd/grsz/grsz_xgmm';
+        $post = "id=&oldpassword={$nowPwd}&password1={$newPwd}&password2={$repeatNewpwd}&upt=1";
+        return $this->httpPost($url, $post, $cookie);
+    }
+
 }
