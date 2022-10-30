@@ -1,0 +1,23 @@
+{
+    "name": "airmole/tjustb-edusys",
+    "description": "Tianjin college,USTB education system HTTP client",
+    "type": "library",
+    "require": {
+        "php": ">=7.4",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+    },
+    "license": "GNU Affero General Public License v3.0",
+    "authors": [
+        {
+            "name": "Airmole",
+            "email": "admin@airmole.cn"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Airmole\\TjustbEdusys\\": "src/"
+        }
+    }
+}
