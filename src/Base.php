@@ -261,6 +261,7 @@ class Base
         $str = preg_replace("/\r\n/", "", $str);
         $str = preg_replace("/\r/", "", $str);
         $str = preg_replace("/\n/", "", $str);
+        $str = preg_replace("/\t/", "", $str);
         $str = trim($str);
         return preg_replace("/&nbsp;/", "", $str);
     }

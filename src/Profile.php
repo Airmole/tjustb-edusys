@@ -32,8 +32,8 @@ class Profile extends Base
         $referer = $this->edusysUrl . '/jsxsd/';
         if ($this->isStudent($this->usercode)) {
             $html = $this->httpGet('/jsxsd/grxx/xsxx', $this->cookie, $referer);
-            $vaildtml = $this->checkCookieByHtml($html['data']);
-            if ($vaildtml !== true) throw new Exception($vaildtml['data']);
+            $vaildHtml = $this->checkCookieByHtml($html['data']);
+            if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
             $html['data'] = $this->formatStudentProfile($html['data']);
             return $html;
         } else {
