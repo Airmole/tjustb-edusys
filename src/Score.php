@@ -41,6 +41,8 @@ class Score extends Base
         $referer = $this->edusysUrl . '/jsxsd/kscj/cjcx_query';
         $post = "kksj={$time}&kcxz={$nature}&kcmc={$course}&xsfs={$show}";
         $score = $this->httpPost('/jsxsd/kscj/cjcx_list', $post, $this->cookie, $referer);
+        $vaildHtml = $this->checkCookieByHtml($score['data']);
+        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
         if ($score['code'] !== self::CODE_SUCCESS) throw new Exception('获取成绩失败');
         $summary = $this->formatScoreSummary($score['data']);
         $score = $this->formatScoreList($score['data']);
@@ -129,9 +131,10 @@ class Score extends Base
             }
             $rowData = $data[$row];
             $score[$row]["SerialNo"] = $rowData[0];
-            $score[$row]["time"] = $rowData[1];
-            $score[$row]["code"] = $rowData[2];
-            $score[$row]["className"] = $rowData[3];
+            $score[$row]["courseSemester"] = $rowData[1];
+            $score[$row]["courseCode"] = $rowData[2];
+            $score[$row]["courseName"] = $rowData[3];
+            $score[$row]["groupName"] = $rowData[4];
             $score[$row]["score"] = $rowData[5];
             $score[$row]["scoreMark"] = $rowData[6];
             $score[$row]["credit"] = $rowData[7];
@@ -139,9 +142,10 @@ class Score extends Base
             $score[$row]["scorePoint"] = $rowData[9];
             $score[$row]["refixTream"] = $rowData[10];
             $score[$row]["accessMethod"] = $rowData[11];
-            $score[$row]["examType"] = $rowData[12];
-            $score[$row]["classType"] = $rowData[13];
-            $score[$row]["classNature"] = $rowData[14];
+            $score[$row]["examNature"] = $rowData[12];
+            $score[$row]["courseType"] = $rowData[13];
+            $score[$row]["courseNature"] = $rowData[14];
+            $score[$row]["courseCategory"] = $rowData[15];
         }
 
         return $score;
@@ -164,42 +168,42 @@ class Score extends Base
         // 所有学期
         $semesters = []; // 学期
         foreach ($score as $item) {
-            if (in_array($item['time'], $semesters)) continue;
-            $semesters[] = $item['time'];
+            if (in_array($item['courseSemester'], $semesters)) continue;
+            $semesters[] = $item['courseSemester'];
         }
 
         // 按学期分类的成绩列表
         $semesterScore = [];
         foreach ($score as $item) {
             foreach ($semesters as $semester) {
-                if ($item['time'] != $semester) continue;
+                if ($item['courseSemester'] != $semester) continue;
                 $semesterScore[$semester]["items"][] = $item;
             }
         }
 
         foreach ($semesters as $semester) {
-            $scoreTotal = 0;
-            $scoreCreditSum = 0;
-            $sumCredit = 0;
-            $sumVaild = 0;
+            $semesterScoreTotal = 0;
+            $semesterScoreCreditSum = 0;
+            $semesterSumCredit = 0;
+            $semesterSumVaild = 0;
             foreach ($semesterScore[$semester]["items"] as $key => $value) {
                 $courseScore = $semesterScore[$semester]["items"][$key]['score'];
                 // 60分以上计入计算加权平均分
                 if (is_numeric($courseScore) && (int)$courseScore >= 60) {
-                    $sumVaild = $sumVaild + 1;
-                    $scoreTotal = $scoreTotal + (int)$courseScore;
+                    $semesterSumVaild = $semesterSumVaild + 1;
+                    $semesterScoreTotal = $semesterScoreTotal + (int)$courseScore;
                     $credit = is_numeric($value['credit']) ? $value['credit'] : sprintf("%01.2f", (float)$value['credit']);
-                    $scoreCreditSum = $scoreCreditSum + ((int)$courseScore * $credit);
-                    $sumCredit = $sumCredit + $value['credit'];
+                    $semesterScoreCreditSum = $semesterScoreCreditSum + ((int)$courseScore * $credit);
+                    $semesterSumCredit = $semesterSumCredit + $value['credit'];
                 }
             }
-            $semesterScore[$semester]["total"] = $scoreTotal;
-            if ($sumVaild == 0) $sumVaild = 1;
-            if ($sumCredit == 0) $sumCredit = 1;
+            $semesterScore[$semester]["total"] = $semesterScoreTotal;
+            if ($semesterSumVaild == 0) $semesterSumVaild = 1;
+            if ($semesterSumCredit == 0) $semesterSumCredit = 1;
             // 学期平均分
-            $avg = sprintf("%01.2f", $scoreTotal / $sumVaild);
+            $avg = sprintf("%01.2f", $semesterScoreTotal / $semesterSumVaild);
             // 学期加权分
-            $gpa = sprintf("%01.2f", $scoreCreditSum / $sumCredit);
+            $gpa = sprintf("%01.2f", $semesterScoreCreditSum / $semesterSumCredit);
             $semesterScore[$semester]["avg"] = $avg;
             $semesterScore[$semester]["gpa"] = $gpa;
             // 学期
@@ -218,6 +222,8 @@ class Score extends Base
     {
         $referer = $this->edusysUrl . '/jsxsd/kscj/cjcx_frm';
         $html = $this->httpGet('/jsxsd/kscj/cjcx_query', $this->cookie, $referer);
+        $vaildHtml = $this->checkCookieByHtml($html['data']);
+        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatScoreQueryOptions($html['data']);
     }
@@ -275,6 +281,5 @@ class Score extends Base
             'show'   => $showOptions
         ];
     }
-
 
 }

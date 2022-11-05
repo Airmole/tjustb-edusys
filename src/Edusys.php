@@ -125,6 +125,18 @@ class Edusys
     }
 
     /**
+     * 获取成绩查询筛选选项列表
+     * @return array
+     * @throws Exception
+     */
+    public function scoreQueryOptions(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $score = new Score($this->usercode, $this->cookie);
+        return $score->scoreQueryOptions();
+    }
+
+    /**
      * 获取成绩
      * @param string $time 开课学期
      * @param string $nature 课程性质
@@ -145,6 +157,45 @@ class Edusys
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
         $score = new Score($this->usercode, $this->cookie);
         return $score->score($time, $nature, $course, $show, $classify);
+    }
+
+    /**
+     * 个人学期课表
+     * @param string $week 上课周
+     * @param string $semester 学期
+     * @return array
+     * @throws Exception
+     */
+    public function semesterCourseTable(string $week = '', string $semester = ''): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $course = new CourseTable($this->usercode, $this->cookie);
+        return $course->semesterCourse($week, $semester);
+    }
+
+    /**
+     * 个人学期课表筛选项列表
+     * @return array
+     * @throws Exception
+     */
+    public function courseTableOptions(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $course = new CourseTable($this->usercode, $this->cookie);
+        return $course->myCourseQueryOptions();
+    }
+
+    /**
+     * 获取某日的周课表
+     * @param string $date Y-m-d日期，默认当天
+     * @return array
+     * @throws Exception
+     */
+    public function dateCourseTable(string $date = ''): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $course = new CourseTable($this->usercode, $this->cookie);
+        return $course->dateCourse($date);
     }
 
 }
