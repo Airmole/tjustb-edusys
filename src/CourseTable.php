@@ -18,6 +18,8 @@ class CourseTable extends Base
         parent::__construct();
         $this->cookie = $cookie;
         $this->usercode = $usercode;
+        if (empty($this->cookie)) throw new Exception('cookie不得为空');
+        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
     }
 
     /**
@@ -53,7 +55,8 @@ class CourseTable extends Base
         $weekValues = $weekValues[1] ?: [];
         if (count($weekNames) !== count($weekValues)) throw new Exception('匹配周次选项列表异常');
         foreach ($weekNames as $index => $weekName) {
-            $weekOptions[] = ['name' => $weekName, 'value' => $weekValues[$index]];
+            $checked = $index === 0;
+            $weekOptions[] = ['name' => $weekName, 'value' => $weekValues[$index], 'checked' => $checked];
         }
 
         // 学年学期选项列表
@@ -66,7 +69,8 @@ class CourseTable extends Base
         $semesterValues = $semesterValues[1] ?: [];
         if (count($semesterNames) !== count($semesterValues)) throw new Exception('匹配学年学期选项列表异常');
         foreach ($semesterNames as $index => $semesterName) {
-            $semesterOptions[] = ['name' => $semesterName, 'value' => $semesterValues[$index]];
+            $checked = $index === 0;
+            $semesterOptions[] = ['name' => $semesterName, 'value' => $semesterValues[$index], 'checked' => $checked];
         }
 
         return ['week' => $weekOptions, 'semester' => $semesterOptions];
@@ -275,7 +279,6 @@ class CourseTable extends Base
     /**
      * @param string $html
      * @return array
-     * @throws Exception
      */
     public function formatDateCourse(string $html): array
     {
