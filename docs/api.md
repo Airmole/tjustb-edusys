@@ -3325,3 +3325,1187 @@ echo json_encode($list);
 </details>
 
 ---
+
+
+
+### 查询班级课表
+
+方法：`classCourse()`
+
+所修参数：
+
+| para           | type   | nullable | default | tips                                       |
+| -------------- | ------ |:--------:|:-------:| ------------------------------------------ |
+| semester       | string | ❌        | ❌       | 学年学期，不可为空，例2022-2023-1                     |
+| timeModel      | string | ❌        | ❌       | 时间模式，请求[班级课表查询筛选项列表](#### 班级课表查询筛选项列表)接口获取 |
+| college        | string | ✅        | ''      | 院系，请求[班级课表查询筛选项列表](#### 班级课表查询筛选项列表)接口获取   |
+| grade          | string | ✅        | ''      | 年级（四位年份数字）                                 |
+| profession     | string | ✅        | ''      | 专业（专业代码）                                   |
+| className      | string | ✅        | ''      | 班级名称                                       |
+| weekStart      | string | ✅        | ''      | 开始周（值1~30）                                 |
+| weekEnd        | string | ✅        | ''      | 结束周（值1~30）                                 |
+| dayOfWeekStart | string | ✅        | ''      | 开始星期几(值1~7)                                |
+| dayOfWeekEnd   | string | ✅        | ''      | 结束星期几(值1~7)                                |
+| serialNoStart  | string | ✅        | ''      | 开始节数                                       |
+| serialNoEnd    | string | ✅        | ''      | 结束节数                                       |
+
+调用示例：
+
+```php
+use Airmole\TjustbEdusys\Edusys;
+
+$usercode = '123456789'; // 系统账号
+$password = '*********'; // 系统密码
+$edusys = new Edusys();
+$edusys->autoLogin($usercode, $password);
+$semester = '2022-2023-1';
+$timeModel = $edusys->classCourseOptions()['timeModel'][0]['value'];
+$college = '';
+$grade = '2021'; 
+$profession = '';
+$className = '会计';
+$list = $edusys->classCourse(
+            $semester,
+            $timeModel,
+            $college,
+            $grade,
+            $profession,
+            $className
+        );
+echo json_encode($list);
+```
+  
+
+<details>
+  <summart>返回参数示例</summary>
+
+```json
+[
+    {
+        "course": [
+            {
+                "title": "星期一",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘书祥",
+                            "startAt": "08:00",
+                            "place": "9教204",
+                            "endAt": "09:35",
+                            "courseName": "刑法学II",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王超",
+                            "startAt": "09:55",
+                            "place": "9教301",
+                            "endAt": "11:30",
+                            "courseName": "民法学II",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘书祥",
+                            "startAt": "13:10",
+                            "place": "9教102",
+                            "endAt": "14:45",
+                            "courseName": "刑法学II(O)",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "李文一",
+                            "startAt": "16:50",
+                            "place": "9教302",
+                            "endAt": "18:25",
+                            "courseName": "行政法与行政诉讼法II",
+                            "className": "法学2101"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期二",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "于飞",
+                            "startAt": "08:00",
+                            "place": "9教107",
+                            "endAt": "09:35",
+                            "courseName": "基础外语AIII",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘志苏",
+                            "startAt": "09:55",
+                            "place": "9教203",
+                            "endAt": "11:30",
+                            "courseName": "商法学I",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王超",
+                            "startAt": "15:00",
+                            "place": "9教202",
+                            "endAt": "16:35",
+                            "courseName": "民法学II",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘国平",
+                            "startAt": "16:50",
+                            "place": "9教201",
+                            "endAt": "18:25",
+                            "courseName": "刑事诉讼法",
+                            "className": "法学2101"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期三",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "史健",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III(31跆拳道)",
+                            "className": "法学2101"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王清梅",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2101"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "孙昌辉",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2101"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王凯",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2101"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "陈富成",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2101"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘鹤伊",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2101"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "赵文男",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1,3-5,7-17周",
+                            "teacher": "刘志苏",
+                            "startAt": "09:55",
+                            "place": "8教106",
+                            "endAt": "11:30",
+                            "courseName": "商法学I",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘国平",
+                            "startAt": "16:50",
+                            "place": "9教201",
+                            "endAt": "18:25",
+                            "courseName": "刑事诉讼法(O)",
+                            "className": "法学2101"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期四",
+                "items": [
+                    [],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "于飞",
+                            "startAt": "13:10",
+                            "place": "9教207",
+                            "endAt": "14:45",
+                            "courseName": "基础外语AIII",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "7-10周",
+                            "teacher": "李雲啸",
+                            "startAt": "16:50",
+                            "place": "9教103",
+                            "endAt": "18:25",
+                            "courseName": "大学生创新创业基础",
+                            "className": "法学2101"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期五",
+                "items": [
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "张北根",
+                            "startAt": "09:55",
+                            "place": "8教102",
+                            "endAt": "11:30",
+                            "courseName": "毛泽东思想和中国特色社会主义理论体系概论I",
+                            "className": "法学2101"
+                        }
+                    ],
+                    [],
+                    [],
+                    [],
+                    [
+                        {
+                            "teachWeek": "2周",
+                            "teacher": "刘志苏",
+                            "startAt": "19:10",
+                            "place": "8教106",
+                            "endAt": "21:35",
+                            "courseName": "商法学I(P)",
+                            "className": "法学2101"
+                        }
+                    ]
+                ]
+            },
+            {
+                "title": "星期六",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期日",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            }
+        ],
+        "className": "法学2101"
+    },
+    {
+        "course": [
+            {
+                "title": "星期一",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘书祥",
+                            "startAt": "08:00",
+                            "place": "9教204",
+                            "endAt": "09:35",
+                            "courseName": "刑法学II",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王超",
+                            "startAt": "09:55",
+                            "place": "9教301",
+                            "endAt": "11:30",
+                            "courseName": "民法学II",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘书祥",
+                            "startAt": "13:10",
+                            "place": "9教102",
+                            "endAt": "14:45",
+                            "courseName": "刑法学II(O)",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘传海",
+                            "startAt": "15:00",
+                            "place": "",
+                            "endAt": "16:35",
+                            "courseName": "体育III(14健身)",
+                            "className": "法学2102"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王凯",
+                            "startAt": "15:00",
+                            "place": "",
+                            "endAt": "16:35",
+                            "courseName": "体育III",
+                            "className": "法学2102"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "周盼盼",
+                            "startAt": "15:00",
+                            "place": "",
+                            "endAt": "16:35",
+                            "courseName": "体育III",
+                            "className": "法学2102"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘鹤伊",
+                            "startAt": "15:00",
+                            "place": "",
+                            "endAt": "16:35",
+                            "courseName": "体育III",
+                            "className": "法学2102"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "陈宇",
+                            "startAt": "15:00",
+                            "place": "",
+                            "endAt": "16:35",
+                            "courseName": "体育III",
+                            "className": "法学2102"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "孙昌辉",
+                            "startAt": "15:00",
+                            "place": "",
+                            "endAt": "16:35",
+                            "courseName": "体育III",
+                            "className": "法学2102"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘莉",
+                            "startAt": "15:00",
+                            "place": "",
+                            "endAt": "16:35",
+                            "courseName": "体育III",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "李文一",
+                            "startAt": "16:50",
+                            "place": "9教302",
+                            "endAt": "18:25",
+                            "courseName": "行政法与行政诉讼法II",
+                            "className": "法学2102"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期二",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "于飞",
+                            "startAt": "08:00",
+                            "place": "9教107",
+                            "endAt": "09:35",
+                            "courseName": "基础外语AIII",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘志苏",
+                            "startAt": "09:55",
+                            "place": "9教203",
+                            "endAt": "11:30",
+                            "courseName": "商法学I",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王超",
+                            "startAt": "15:00",
+                            "place": "9教202",
+                            "endAt": "16:35",
+                            "courseName": "民法学II",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘国平",
+                            "startAt": "16:50",
+                            "place": "9教201",
+                            "endAt": "18:25",
+                            "courseName": "刑事诉讼法",
+                            "className": "法学2102"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期三",
+                "items": [
+                    [],
+                    [
+                        {
+                            "teachWeek": "1,3-5,7-17周",
+                            "teacher": "刘志苏",
+                            "startAt": "09:55",
+                            "place": "8教106",
+                            "endAt": "11:30",
+                            "courseName": "商法学I",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘国平",
+                            "startAt": "16:50",
+                            "place": "9教201",
+                            "endAt": "18:25",
+                            "courseName": "刑事诉讼法(O)",
+                            "className": "法学2102"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期四",
+                "items": [
+                    [],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "于飞",
+                            "startAt": "13:10",
+                            "place": "9教207",
+                            "endAt": "14:45",
+                            "courseName": "基础外语AIII",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "7-10周",
+                            "teacher": "李雲啸",
+                            "startAt": "16:50",
+                            "place": "9教103",
+                            "endAt": "18:25",
+                            "courseName": "大学生创新创业基础",
+                            "className": "法学2102"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期五",
+                "items": [
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "张北根",
+                            "startAt": "09:55",
+                            "place": "8教102",
+                            "endAt": "11:30",
+                            "courseName": "毛泽东思想和中国特色社会主义理论体系概论I",
+                            "className": "法学2102"
+                        }
+                    ],
+                    [],
+                    [],
+                    [],
+                    [
+                        {
+                            "teachWeek": "2周",
+                            "teacher": "刘志苏",
+                            "startAt": "19:10",
+                            "place": "8教106",
+                            "endAt": "21:35",
+                            "courseName": "商法学I(P)",
+                            "className": "法学2102"
+                        }
+                    ]
+                ]
+            },
+            {
+                "title": "星期六",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期日",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            }
+        ],
+        "className": "法学2102"
+    },
+    {
+        "course": [
+            {
+                "title": "星期一",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王经",
+                            "startAt": "08:00",
+                            "place": "9教301",
+                            "endAt": "09:35",
+                            "courseName": "民法学II",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "于飞",
+                            "startAt": "09:55",
+                            "place": "9教107",
+                            "endAt": "11:30",
+                            "courseName": "基础外语AIII",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘书祥",
+                            "startAt": "15:00",
+                            "place": "9教204",
+                            "endAt": "16:35",
+                            "courseName": "刑法学II",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期二",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "史健",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III(21跆拳道)",
+                            "className": "法学2103"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "孙昌辉",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2103"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘传海",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2103"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "周盼盼",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2103"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "赵文男",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2103"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "陈宇",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2103"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "单佳",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘书祥",
+                            "startAt": "13:10",
+                            "place": "9教102",
+                            "endAt": "14:45",
+                            "courseName": "刑法学II(O)",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘国平",
+                            "startAt": "15:00",
+                            "place": "9教201",
+                            "endAt": "16:35",
+                            "courseName": "刑事诉讼法",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘志苏",
+                            "startAt": "16:50",
+                            "place": "9教203",
+                            "endAt": "18:25",
+                            "courseName": "商法学I",
+                            "className": "法学2103"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期三",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "于飞",
+                            "startAt": "08:00",
+                            "place": "9教106",
+                            "endAt": "09:35",
+                            "courseName": "基础外语AIII",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘志苏",
+                            "startAt": "13:10",
+                            "place": "9教108",
+                            "endAt": "14:45",
+                            "courseName": "商法学I(O)",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘国平",
+                            "startAt": "15:00",
+                            "place": "9教201",
+                            "endAt": "16:35",
+                            "courseName": "刑事诉讼法(O)",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期四",
+                "items": [
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王经",
+                            "startAt": "09:55",
+                            "place": "9教301",
+                            "endAt": "11:30",
+                            "courseName": "民法学II",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "李文一",
+                            "startAt": "15:00",
+                            "place": "9教203",
+                            "endAt": "16:35",
+                            "courseName": "行政法与行政诉讼法II",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "7-10周",
+                            "teacher": "李雲啸",
+                            "startAt": "16:50",
+                            "place": "9教103",
+                            "endAt": "18:25",
+                            "courseName": "大学生创新创业基础",
+                            "className": "法学2103"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期五",
+                "items": [
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "张北根",
+                            "startAt": "09:55",
+                            "place": "8教102",
+                            "endAt": "11:30",
+                            "courseName": "毛泽东思想和中国特色社会主义理论体系概论I",
+                            "className": "法学2103"
+                        }
+                    ],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期六",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期日",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            }
+        ],
+        "className": "法学2103"
+    },
+    {
+        "course": [
+            {
+                "title": "星期一",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王经",
+                            "startAt": "08:00",
+                            "place": "9教301",
+                            "endAt": "09:35",
+                            "courseName": "民法学II",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "于飞",
+                            "startAt": "09:55",
+                            "place": "9教107",
+                            "endAt": "11:30",
+                            "courseName": "基础外语AIII",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘书祥",
+                            "startAt": "15:00",
+                            "place": "9教204",
+                            "endAt": "16:35",
+                            "courseName": "刑法学II",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期二",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "陈宇",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III(21游泳)",
+                            "className": "法学2104"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "赵文男",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2104"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "周盼盼",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2104"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "孙昌辉",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2104"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘传海",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2104"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "单佳",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2104"
+                        },
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "史健",
+                            "startAt": "08:00",
+                            "place": "",
+                            "endAt": "09:35",
+                            "courseName": "体育III",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘书祥",
+                            "startAt": "13:10",
+                            "place": "9教102",
+                            "endAt": "14:45",
+                            "courseName": "刑法学II(O)",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘国平",
+                            "startAt": "15:00",
+                            "place": "9教201",
+                            "endAt": "16:35",
+                            "courseName": "刑事诉讼法",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘志苏",
+                            "startAt": "16:50",
+                            "place": "9教203",
+                            "endAt": "18:25",
+                            "courseName": "商法学I",
+                            "className": "法学2104"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期三",
+                "items": [
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "于飞",
+                            "startAt": "08:00",
+                            "place": "9教106",
+                            "endAt": "09:35",
+                            "courseName": "基础外语AIII",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "郭敏",
+                            "startAt": "09:55",
+                            "place": "8教102",
+                            "endAt": "11:30",
+                            "courseName": "毛泽东思想和中国特色社会主义理论体系概论I",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘志苏",
+                            "startAt": "13:10",
+                            "place": "9教108",
+                            "endAt": "14:45",
+                            "courseName": "商法学I(O)",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "刘国平",
+                            "startAt": "15:00",
+                            "place": "9教201",
+                            "endAt": "16:35",
+                            "courseName": "刑事诉讼法(O)",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期四",
+                "items": [
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "王经",
+                            "startAt": "09:55",
+                            "place": "9教301",
+                            "endAt": "11:30",
+                            "courseName": "民法学II",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [],
+                    [
+                        {
+                            "teachWeek": "1-5,7-17周",
+                            "teacher": "李文一",
+                            "startAt": "15:00",
+                            "place": "9教203",
+                            "endAt": "16:35",
+                            "courseName": "行政法与行政诉讼法II",
+                            "className": "法学2104"
+                        }
+                    ],
+                    [
+                        {
+                            "teachWeek": "7-10周",
+                            "teacher": "李雲啸",
+                            "startAt": "16:50",
+                            "place": "9教103",
+                            "endAt": "18:25",
+                            "courseName": "大学生创新创业基础",
+                            "className": "法学2104"
+                        }
+                    ],
+                    []
+                ]
+            },
+            {
+                "title": "星期五",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期六",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            },
+            {
+                "title": "星期日",
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ]
+            }
+        ],
+        "className": "法学2104"
+    }
+]
+```
+
+</details>

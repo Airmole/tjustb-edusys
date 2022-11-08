@@ -231,7 +231,7 @@ class Edusys
     public function classCourseOptions(): array
     {
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
-        $classCourse = new classCourseTable($this->usercode, $this->cookie);
+        $classCourse = new ClassCourseTable($this->usercode, $this->cookie);
         return $classCourse->options();
     }
 
@@ -245,8 +245,58 @@ class Edusys
     public function getProfessions(string $collegeCode = '', string $grade = ''): array
     {
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
-        $classCourse = new classCourseTable($this->usercode, $this->cookie);
+        $classCourse = new ClassCourseTable($this->usercode, $this->cookie);
         return $classCourse->getProfessionsByCollege($collegeCode, $grade);
+    }
+
+    /**
+     * 班级课表查询
+     * @param string $semester 学年学期 2022-2023-1
+     * @param string $timeModel 时间模式
+     * @param string $college 院系
+     * @param string $grade 年级（四位年份数字）
+     * @param string $profession 专业
+     * @param string $className 班级名称
+     * @param string $weekStart 开始周（值1~30）
+     * @param string $weekEnd 结束周（值1~30）
+     * @param string $dayOfWeekStart 开始星期几（值1~7）
+     * @param string $dayOfWeekEnd 结束星期几（值1~7）
+     * @param string $serialNoStart 开始节数
+     * @param string $serialNoEnd 结束节数
+     * @return array
+     * @throws Exception
+     */
+    public function classCourse(
+        string $semester = '',
+        string $timeModel = '',
+        string $college = '',
+        string $grade = '',
+        string $profession = '',
+        string $className = '',
+        string $weekStart = '',
+        string $weekEnd = '',
+        string $dayOfWeekStart = '',
+        string $dayOfWeekEnd = '',
+        string $serialNoStart = '',
+        string $serialNoEnd = ''
+    ): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $classCourse = new ClassCourseTable($this->usercode, $this->cookie);
+        return $classCourse->classCourse(
+            $semester,
+            $timeModel,
+            $college,
+            $grade,
+            $profession,
+            $className,
+            $weekStart,
+            $weekEnd,
+            $dayOfWeekStart,
+            $dayOfWeekEnd,
+            $serialNoStart,
+            $serialNoEnd
+        );
     }
 
 }
