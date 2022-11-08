@@ -3374,7 +3374,7 @@ echo json_encode($list);
 ```
 
 <details>
-  <summart>返回参数示例</summary>
+  <summary>返回参数示例</summary>
 
 ```json
 [
