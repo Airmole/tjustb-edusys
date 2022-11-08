@@ -296,7 +296,7 @@ class Base
     public function checkCookieByHtml(string $html)
     {
         if (strpos($html, '用户名或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
-        if (strpos($html, '您的账号在其它地方登录')) return ['code' => 403, 'data' => '请重新登录'];
+        if (strpos($html, '您的账号在其它地方登录')) return ['code' => 403, 'data' => '您的账号在其它地方登录'];
         if (strpos($html, '请先登录系统')) return ['code' => 403, 'data' => '未登录,请重新登录'];
         return true;
     }

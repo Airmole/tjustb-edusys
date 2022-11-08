@@ -198,4 +198,55 @@ class Edusys
         return $course->dateCourse($date);
     }
 
+    /**
+     * 教学周历筛选项
+     * @return array
+     * @throws Exception
+     */
+    public function calendarOptions(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $calendar = new Calendar($this->usercode, $this->cookie);
+        return $calendar->calencarOptions();
+    }
+
+    /**
+     * 获取教学周历
+     * @param string $semester
+     * @return array
+     * @throws Exception
+     */
+    public function calendar(string $semester = ''): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $calendar = new Calendar($this->usercode, $this->cookie);
+        return $calendar->calendar($semester);
+    }
+
+    /**
+     * 班级课表查询筛选项列表
+     * @return array
+     * @throws Exception
+     */
+    public function classCourseOptions(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $classCourse = new classCourseTable($this->usercode, $this->cookie);
+        return $classCourse->options();
+    }
+
+    /**
+     * 获取专业
+     * @param string $collegeCode 院系代码（可从classCourseOptions()方法返回获取）
+     * @param string $grade 年级（四位年份数字）
+     * @return array
+     * @throws Exception
+     */
+    public function getProfessions(string $collegeCode = '', string $grade = ''): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $classCourse = new classCourseTable($this->usercode, $this->cookie);
+        return $classCourse->getProfessionsByCollege($collegeCode, $grade);
+    }
+
 }

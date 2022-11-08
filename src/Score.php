@@ -18,6 +18,8 @@ class Score extends Base
         parent::__construct();
         $this->cookie = $cookie;
         $this->usercode = $usercode;
+        if (empty($this->cookie)) throw new Exception('cookie不得为空');
+        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
     }
 
     /**
