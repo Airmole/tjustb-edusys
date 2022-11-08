@@ -3326,28 +3326,26 @@ echo json_encode($list);
 
 ---
 
-
-
 ### 查询班级课表
 
 方法：`classCourse()`
 
 所修参数：
 
-| para           | type   | nullable | default | tips                                       |
-| -------------- | ------ |:--------:|:-------:| ------------------------------------------ |
-| semester       | string | ❌        | ❌       | 学年学期，不可为空，例2022-2023-1                     |
-| timeModel      | string | ❌        | ❌       | 时间模式，请求[班级课表查询筛选项列表](#### 班级课表查询筛选项列表)接口获取 |
-| college        | string | ✅        | ''      | 院系，请求[班级课表查询筛选项列表](#### 班级课表查询筛选项列表)接口获取   |
-| grade          | string | ✅        | ''      | 年级（四位年份数字）                                 |
-| profession     | string | ✅        | ''      | 专业（专业代码）                                   |
-| className      | string | ✅        | ''      | 班级名称                                       |
-| weekStart      | string | ✅        | ''      | 开始周（值1~30）                                 |
-| weekEnd        | string | ✅        | ''      | 结束周（值1~30）                                 |
-| dayOfWeekStart | string | ✅        | ''      | 开始星期几(值1~7)                                |
-| dayOfWeekEnd   | string | ✅        | ''      | 结束星期几(值1~7)                                |
-| serialNoStart  | string | ✅        | ''      | 开始节数                                       |
-| serialNoEnd    | string | ✅        | ''      | 结束节数                                       |
+| para           | type   | nullable | default | tips                                   |
+| -------------- | ------ |:--------:|:-------:| -------------------------------------- |
+| semester       | string | ❌        | ❌       | 学年学期，不可为空，例2022-2023-1                 |
+| timeModel      | string | ❌        | ❌       | 时间模式，请求[班级课表查询筛选项列表](#班级课表查询筛选项列表)接口获取 |
+| college        | string | ✅        | ''      | 院系，请求[班级课表查询筛选项列表](#班级课表查询筛选项列表)接口获取   |
+| grade          | string | ✅        | ''      | 年级（四位年份数字）                             |
+| profession     | string | ✅        | ''      | 专业（专业代码）                               |
+| className      | string | ✅        | ''      | 班级名称                                   |
+| weekStart      | string | ✅        | ''      | 开始周（值1~30）                             |
+| weekEnd        | string | ✅        | ''      | 结束周（值1~30）                             |
+| dayOfWeekStart | string | ✅        | ''      | 开始星期几(值1~7)                            |
+| dayOfWeekEnd   | string | ✅        | ''      | 结束星期几(值1~7)                            |
+| serialNoStart  | string | ✅        | ''      | 开始节数                                   |
+| serialNoEnd    | string | ✅        | ''      | 结束节数                                   |
 
 调用示例：
 
@@ -3374,7 +3372,6 @@ $list = $edusys->classCourse(
         );
 echo json_encode($list);
 ```
-  
 
 <details>
   <summart>返回参数示例</summary>
