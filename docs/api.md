@@ -18,6 +18,9 @@
 - [获取教学周历](#获取教学周历)
 - [班级课表筛选项列表](#班级课表查询筛选项列表)
 - [获取专业列表](#获取专业列表)
+- [查询班级课表](#查询班级课表)
+- [教师课表查询筛选项列表](#教师课表查询筛选项列表)
+- [查询教师课表](#查询教师课表)
 
 ---
 
@@ -4502,6 +4505,802 @@ echo json_encode($list);
         ],
         "className": "法学2104"
     }
+]
+```
+
+</details>
+
+---
+
+### 教师课表查询筛选项列表
+
+方法：`teacherCourseOptions()`
+
+调用示例：
+
+```php
+use Airmole\TjustbEdusys\Edusys;
+
+$usercode = '123456789'; // 系统账号
+$password = '*********'; // 系统密码
+$edusys = new Edusys();
+$edusys->autoLogin($usercode, $password);
+$list = $edusys->teacherCourseOptions();
+echo json_encode($list);
+```
+
+<details>
+  <summary>返回参数示例</summary>
+
+```json
+{
+    "timeModel": [
+        {
+            "value": "9473F3E0DCAB413BE0535BDCFA0AFB99",
+            "name": "默认节次模式",
+            "checked": true
+        }
+    ],
+    "semester": [
+        {
+            "value": "2022-2023-1",
+            "name": "2022-2023-1",
+            "checked": true
+        },
+        {
+            "value": "2021-2022-2",
+            "name": "2021-2022-2",
+            "checked": false
+        },
+        {
+            "value": "2021-2022-1",
+            "name": "2021-2022-1",
+            "checked": false
+        },
+        {
+            "value": "2020-2021-2",
+            "name": "2020-2021-2",
+            "checked": false
+        },
+        {
+            "value": "2020-2021-1",
+            "name": "2020-2021-1",
+            "checked": false
+        },
+        {
+            "value": "2019-2020-2",
+            "name": "2019-2020-2",
+            "checked": false
+        },
+        {
+            "value": "2019-2020-1",
+            "name": "2019-2020-1",
+            "checked": false
+        },
+        {
+            "value": "2018-2019-2",
+            "name": "2018-2019-2",
+            "checked": false
+        },
+        {
+            "value": "2018-2019-1",
+            "name": "2018-2019-1",
+            "checked": false
+        },
+        {
+            "value": "2017-2018-2",
+            "name": "2017-2018-2",
+            "checked": false
+        },
+        {
+            "value": "2017-2018-1",
+            "name": "2017-2018-1",
+            "checked": false
+        },
+        {
+            "value": "2016-2017-3",
+            "name": "2016-2017-3",
+            "checked": false
+        },
+        {
+            "value": "2016-2017-2",
+            "name": "2016-2017-2",
+            "checked": false
+        },
+        {
+            "value": "2016-2017-1",
+            "name": "2016-2017-1",
+            "checked": false
+        },
+        {
+            "value": "2015-2016-3",
+            "name": "2015-2016-3",
+            "checked": false
+        },
+        {
+            "value": "2015-2016-2",
+            "name": "2015-2016-2",
+            "checked": false
+        },
+        {
+            "value": "2015-2016-1",
+            "name": "2015-2016-1",
+            "checked": false
+        },
+        {
+            "value": "2014-2015-3",
+            "name": "2014-2015-3",
+            "checked": false
+        },
+        {
+            "value": "2014-2015-2",
+            "name": "2014-2015-2",
+            "checked": false
+        },
+        {
+            "value": "2014-2015-1",
+            "name": "2014-2015-1",
+            "checked": false
+        },
+        {
+            "value": "2013-2014-3",
+            "name": "2013-2014-3",
+            "checked": false
+        },
+        {
+            "value": "2013-2014-2",
+            "name": "2013-2014-2",
+            "checked": false
+        },
+        {
+            "value": "2013-2014-1",
+            "name": "2013-2014-1",
+            "checked": false
+        },
+        {
+            "value": "2012-2013-3",
+            "name": "2012-2013-3",
+            "checked": false
+        },
+        {
+            "value": "2012-2013-2",
+            "name": "2012-2013-2",
+            "checked": false
+        },
+        {
+            "value": "2012-2013-1",
+            "name": "2012-2013-1",
+            "checked": false
+        },
+        {
+            "value": "2011-2012-2",
+            "name": "2011-2012-2",
+            "checked": false
+        },
+        {
+            "value": "2011-2012-1",
+            "name": "2011-2012-1",
+            "checked": false
+        },
+        {
+            "value": "2010-2011-3",
+            "name": "2010-2011-3",
+            "checked": false
+        },
+        {
+            "value": "2010-2011-2",
+            "name": "2010-2011-2",
+            "checked": false
+        },
+        {
+            "value": "2010-2011-1",
+            "name": "2010-2011-1",
+            "checked": false
+        },
+        {
+            "value": "2010-2011-0",
+            "name": "2010-2011-0",
+            "checked": false
+        },
+        {
+            "value": "2009-2010-3",
+            "name": "2009-2010-3",
+            "checked": false
+        },
+        {
+            "value": "2009-2010-2",
+            "name": "2009-2010-2",
+            "checked": false
+        },
+        {
+            "value": "2009-2010-1",
+            "name": "2009-2010-1",
+            "checked": false
+        },
+        {
+            "value": "2009-2010-0",
+            "name": "2009-2010-0",
+            "checked": false
+        },
+        {
+            "value": "2008-2009-3",
+            "name": "2008-2009-3",
+            "checked": false
+        },
+        {
+            "value": "2008-2009-2",
+            "name": "2008-2009-2",
+            "checked": false
+        },
+        {
+            "value": "2008-2009-1",
+            "name": "2008-2009-1",
+            "checked": false
+        },
+        {
+            "value": "2007-2008-3",
+            "name": "2007-2008-3",
+            "checked": false
+        },
+        {
+            "value": "2007-2008-2",
+            "name": "2007-2008-2",
+            "checked": false
+        },
+        {
+            "value": "2007-2008-1",
+            "name": "2007-2008-1",
+            "checked": false
+        },
+        {
+            "value": "2006-2007-3",
+            "name": "2006-2007-3",
+            "checked": false
+        },
+        {
+            "value": "2006-2007-2",
+            "name": "2006-2007-2",
+            "checked": false
+        },
+        {
+            "value": "2006-2007-1",
+            "name": "2006-2007-1",
+            "checked": false
+        },
+        {
+            "value": "2005-2006-2",
+            "name": "2005-2006-2",
+            "checked": false
+        },
+        {
+            "value": "2005-2006-1",
+            "name": "2005-2006-1",
+            "checked": false
+        },
+        {
+            "value": "2004-2005-2",
+            "name": "2004-2005-2",
+            "checked": false
+        },
+        {
+            "value": "2004-2005-1",
+            "name": "2004-2005-1",
+            "checked": false
+        },
+        {
+            "value": "2003-2004-2",
+            "name": "2003-2004-2",
+            "checked": false
+        },
+        {
+            "value": "2003-2004-1",
+            "name": "2003-2004-1",
+            "checked": false
+        },
+        {
+            "value": "2002-2003-2",
+            "name": "2002-2003-2",
+            "checked": false
+        },
+        {
+            "value": "2002-2003-1",
+            "name": "2002-2003-1",
+            "checked": false
+        },
+        {
+            "value": "2001-2002-2",
+            "name": "2001-2002-2",
+            "checked": false
+        },
+        {
+            "value": "2001-2002-1",
+            "name": "2001-2002-1",
+            "checked": false
+        },
+        {
+            "value": "2000-2001-2",
+            "name": "2000-2001-2",
+            "checked": false
+        },
+        {
+            "value": "2000-2001-1",
+            "name": "2000-2001-1",
+            "checked": false
+        }
+    ],
+    "college": [
+        {
+            "value": "",
+            "name": "-请选择-",
+            "checked": true
+        },
+        {
+            "value": "011",
+            "name": "[011]土木工程系",
+            "checked": false
+        },
+        {
+            "value": "012",
+            "name": "[012]环境工程系",
+            "checked": false
+        },
+        {
+            "value": "013",
+            "name": "[013]艺术设计系",
+            "checked": false
+        },
+        {
+            "value": "02",
+            "name": "[02]护理系",
+            "checked": false
+        },
+        {
+            "value": "1669097690654C2697E66260C1E678C9",
+            "name": "[022]康复治疗系",
+            "checked": false
+        },
+        {
+            "value": "03",
+            "name": "[03]材料科学与工程系",
+            "checked": false
+        },
+        {
+            "value": "04",
+            "name": "[04]机械工程系",
+            "checked": false
+        },
+        {
+            "value": "F367CE0C4668477DA1F3D59B52D1AC43",
+            "name": "[042]通信工程系",
+            "checked": false
+        },
+        {
+            "value": "DAD1F16577B44F8D9439402F4E8CEADB",
+            "name": "[043]智能制造学院",
+            "checked": false
+        },
+        {
+            "value": "051",
+            "name": "[051]信息工程系",
+            "checked": false
+        },
+        {
+            "value": "06",
+            "name": "[06]音乐系",
+            "checked": false
+        },
+        {
+            "value": "FA5BD4515C4C4FA0987A6FC97C1F94E9",
+            "name": "[062]舞蹈系",
+            "checked": false
+        },
+        {
+            "value": "071",
+            "name": "[071]经济系",
+            "checked": false
+        },
+        {
+            "value": "08",
+            "name": "[08]法律系",
+            "checked": false
+        },
+        {
+            "value": "09",
+            "name": "[09]外语系",
+            "checked": false
+        },
+        {
+            "value": "091A1730BF0E4621BD53DEFED59D756A",
+            "name": "[10]无人机系",
+            "checked": false
+        },
+        {
+            "value": "171",
+            "name": "[171]管理系",
+            "checked": false
+        },
+        {
+            "value": "19E92A97E94D463587B72C954F33DAEF",
+            "name": "[21]武装部",
+            "checked": false
+        },
+        {
+            "value": "27",
+            "name": "[27]实验室管理中心",
+            "checked": false
+        },
+        {
+            "value": "547D47D5D53B4EB1AB09E6E551441C7E",
+            "name": "[35]资产管理中心",
+            "checked": false
+        },
+        {
+            "value": "7BCD2332A8D04C108B01551417684BF9",
+            "name": "[36]保卫处",
+            "checked": false
+        },
+        {
+            "value": "43",
+            "name": "[43]体育部",
+            "checked": false
+        },
+        {
+            "value": "44",
+            "name": "[44]思想政治部",
+            "checked": false
+        },
+        {
+            "value": "45",
+            "name": "[45]公共教学部",
+            "checked": false
+        },
+        {
+            "value": "8D689F95650644F5B873356BFB248084",
+            "name": "[46]劳动学院",
+            "checked": false
+        },
+        {
+            "value": "52",
+            "name": "[52]基础部",
+            "checked": false
+        }
+    ]
+}
+```
+
+</details>
+
+ ---
+
+### 查询教师课表
+
+> 部分上课班级信息与课程名称混在一起，难以分离，因此返回信息暂不返回上课班级名称
+
+ 方法：`teacherCourse()`
+
+所需参数：
+
+| para           | type   | nullable | default | tips                                   |
+| -------------- | ------ |:--------:|:-------:| -------------------------------------- |
+| semester       | string | ❌        | ❌       | 学年学期，不可为空，例2022-2023-1                 |
+| timeModel      | string | ❌        | ❌       | 时间模式，请求[教师课表查询筛选项列表](#教师课表查询筛选项列表)接口获取 |
+| college        | string | ✅        | ''      | 院系，请求[教师课表查询筛选项列表](#教师课表查询筛选项列表)接口获取   |
+| teacherLevel   | string | ✅        | ''      | 教师职称（系统隐藏未使用，保持空值即可）                   |
+| teacherName    | string | ✅        | ''      | 教师姓名                                   |
+| weekStart      | string | ✅        | ''      | 开始周（值1~30）                             |
+| weekEnd        | string | ✅        | ''      | 结束周（值1~30）                             |
+| dayOfWeekStart | string | ✅        | ''      | 开始星期几(值1~7)                            |
+| dayOfWeekEnd   | string | ✅        | ''      | 结束星期几(值1~7)                            |
+| serialNoStart  | string | ✅        | ''      | 开始节数                                   |
+| serialNoEnd    | string | ✅        | ''      | 结束节数                                   |
+
+调用示例：
+
+```php
+use Airmole\TjustbEdusys\Edusys;
+
+$usercode = '123456789'; // 系统账号
+$password = '*********'; // 系统密码
+$edusys = new Edusys();
+$edusys->autoLogin($usercode, $password);
+$semester = '2022-2023-1';
+$timeModel = $edusys->teacherCourseOptions()['timeModel'][0]['value'];
+$college = '';
+$teacherLevel = '';
+$teacherName = '张';
+$list = $edusys->teacherCourse(
+            $semester,
+            $timeModel,
+            $college,
+            $teacherLevel,
+            $teacherName,
+            ‘’,
+            ‘’,
+            ‘’,
+            '',
+            '',
+            ''
+        );
+echo json_encode($list);
+```
+
+<details>
+  <summary>返回参数示例</summary>
+
+```json
+[
+  {
+    "teacherName": "张北根",
+    "course": [
+      {
+        "title": "星期一",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期二",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期三",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期四",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期五",
+        "items": [
+          [
+            {
+              "teachWeek": "1-5,7-17周",
+              "teacher": "张北根",
+              "startAt": "08:00",
+              "place": "8教102",
+              "endAt": "09:35",
+              "courseName": "毛泽东思想和中国特色社会主义理论体系概论I计2101-3"
+            }
+          ],
+          [
+            {
+              "teachWeek": "1-5,7-17周",
+              "teacher": "张北根",
+              "startAt": "09:55",
+              "place": "8教102",
+              "endAt": "11:30",
+              "courseName": "毛泽东思想和中国特色社会主义理论体系概论I法学2101-3"
+            }
+          ],
+          [
+            {
+              "teachWeek": "1-5,7-17周",
+              "teacher": "张北根",
+              "startAt": "13:10",
+              "place": "8教102",
+              "endAt": "14:45",
+              "courseName": "毛泽东思想和中国特色社会主义理论体系概论I计智2101-3"
+            }
+          ],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期六",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期日",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      }
+    ]
+  },
+  {
+    "teacherName": "张伟",
+    "course": [
+      {
+        "title": "星期一",
+        "items": [
+          [],
+          [
+            {
+              "teachWeek": "2-5,7-17周",
+              "teacher": "张伟",
+              "startAt": "09:55",
+              "place": "10教303",
+              "endAt": "11:30",
+              "courseName": "程序设计基础I计[2211-2212]班"
+            }
+          ],
+          [
+            {
+              "teachWeek": "1-5,7-17周",
+              "teacher": "张伟",
+              "startAt": "13:10",
+              "place": "10教303",
+              "endAt": "14:45",
+              "courseName": "Linux操作系统计[2005-2006]班"
+            }
+          ],
+          [],
+          [
+            {
+              "teachWeek": "1-5,7-13周",
+              "teacher": "张伟",
+              "startAt": "16:50",
+              "place": "9教307",
+              "endAt": "18:25",
+              "courseName": "Java面向对象程序设计通信[2101-2102]班"
+            }
+          ],
+          []
+        ]
+      },
+      {
+        "title": "星期二",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [
+            {
+              "teachWeek": "2-5,7-14周",
+              "teacher": "张伟",
+              "startAt": "16:50",
+              "place": "10教301",
+              "endAt": "18:25",
+              "courseName": "Java面向对象程序设计通信[2101-2102]班"
+            }
+          ],
+          []
+        ]
+      },
+      {
+        "title": "星期三",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期四",
+        "items": [
+          [],
+          [],
+          [
+            {
+              "teachWeek": "1-5,7-17周",
+              "teacher": "张伟",
+              "startAt": "13:10",
+              "place": "10教303",
+              "endAt": "14:45",
+              "courseName": "Linux操作系统计[2003-2004]班"
+            }
+          ],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期五",
+        "items": [
+          [
+            {
+              "teachWeek": "1-5,7-9周",
+              "teacher": "张伟",
+              "startAt": "08:00",
+              "place": "3教410",
+              "endAt": "09:35",
+              "courseName": "Python高级应用无人机[2001-2004]班"
+            }
+          ],
+          [
+            {
+              "teachWeek": "1-5,7-9周",
+              "teacher": "张伟",
+              "startAt": "09:55",
+              "place": "3教410",
+              "endAt": "11:30",
+              "courseName": "Python高级应用无人机[2001-2004]班"
+            }
+          ],
+          [],
+          [
+            {
+              "teachWeek": "1-5,7-9周",
+              "teacher": "张伟",
+              "startAt": "15:00",
+              "place": "3教410",
+              "endAt": "16:35",
+              "courseName": "Python高级应用计[2004-2008]班"
+            }
+          ],
+          [
+            {
+              "teachWeek": "1-5,7-9周",
+              "teacher": "张伟",
+              "startAt": "16:50",
+              "place": "3教410",
+              "endAt": "18:25",
+              "courseName": "Python高级应用计[2004-2008]班"
+            }
+          ],
+          []
+        ]
+      },
+      {
+        "title": "星期六",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      },
+      {
+        "title": "星期日",
+        "items": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      }
+    ]
+  }
 ]
 ```
 

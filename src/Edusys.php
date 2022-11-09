@@ -299,4 +299,63 @@ class Edusys
         );
     }
 
+    /**
+     * 教师课表查询筛选项
+     * @return array
+     * @throws Exception
+     */
+    public function teacherCourseOptions(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $teacherCourse = new TeacherCourseTable($this->usercode, $this->cookie);
+        return $teacherCourse->options();
+    }
+
+    /**
+     * 教师课表查询
+     * @param string $semester
+     * @param string $timeModel
+     * @param string $college
+     * @param string $teacherLevel
+     * @param string $teacherName
+     * @param string $weekStart
+     * @param string $weekEnd
+     * @param string $dayOfWeekStart
+     * @param string $dayOfWeekEnd
+     * @param string $serialNoStart
+     * @param string $serialNoEnd
+     * @return array
+     * @throws Exception
+     */
+    public function teacherCourse(
+        string $semester = '',
+        string $timeModel = '',
+        string $college = '',
+        string $teacherLevel = '',
+        string $teacherName = '',
+        string $weekStart = '',
+        string $weekEnd = '',
+        string $dayOfWeekStart = '',
+        string $dayOfWeekEnd = '',
+        string $serialNoStart = '',
+        string $serialNoEnd = ''
+    ): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $teacherCourse = new TeacherCourseTable($this->usercode, $this->cookie);
+        return $teacherCourse->teacherCourse(
+            $semester,
+            $timeModel,
+            $college,
+            $teacherLevel,
+            $teacherName,
+            $weekStart,
+            $weekEnd,
+            $dayOfWeekStart,
+            $dayOfWeekEnd,
+            $serialNoStart,
+            $serialNoEnd
+        );
+    }
+
 }

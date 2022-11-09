@@ -301,4 +301,29 @@ class Base
         return true;
     }
 
+    /**
+     * 匹配解析某下拉列表值
+     * @param string $html
+     * @param string $namePattern
+     * @param string $valuePattern
+     * @return array
+     * @throws Exception
+     */
+    public function formatOption(string $html, string $namePattern = '', string $valuePattern = ''): array
+    {
+        $result = [];
+        $namePattern = $namePattern === '' ? '/>(.*)?<\/option>/' : $namePattern;
+        $valuePattern = $valuePattern === '' ? '/<option value="(.*)?" /' : $valuePattern;
+        preg_match_all($namePattern, $html, $names);
+        preg_match_all($valuePattern, $html, $values);
+        $names = $names ? $names[1] : [];
+        $values = $values ? $values[1] : [];
+        if (count($names) !== count($values)) throw new Exception('匹配模式选项列表异常');
+        foreach ($names as $index => $name) {
+            $checked = $index === 0;
+            $result[] = ['name' => $name, 'value' => $values[$index], 'checked' => $checked];
+        }
+        return $result;
+    }
+
 }
