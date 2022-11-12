@@ -358,4 +358,66 @@ class Edusys
         );
     }
 
+    /**
+     * 课程课表查询筛选项
+     * @return array
+     * @throws Exception
+     */
+    public function lessionCourseOptions(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $lessionCourse = new LessionCourseTable($this->usercode, $this->cookie);
+        return $lessionCourse->options();
+    }
+
+    /**
+     * 查询课程课表
+     * @param string $semester 学年学期
+     * @param string $timeModel 时间模式
+     * @param string $studyCollege 上课院系
+     * @param string $teachCollege 开课院系
+     * @param string $courseNature 课程属性
+     * @param string $courseName 课程名称
+     * @param string $weekStart 开始周（值1~30）
+     * @param string $weekEnd 结束周（值1~30）
+     * @param string $dayOfWeekStart 开始星期几（值1~7）
+     * @param string $dayOfWeekEnd 结束星期几（值1~7）
+     * @param string $serialNoStart 开始节数
+     * @param string $serialNoEnd 结束节数
+     * @return array
+     * @throws Exception
+     */
+    public function lessionCourse(
+        string $semester = '',
+        string $timeModel = '',
+        string $studyCollege = '',
+        string $teachCollege = '',
+        string $courseNature = '',
+        string $courseName = '',
+        string $weekStart = '',
+        string $weekEnd = '',
+        string $dayOfWeekStart = '',
+        string $dayOfWeekEnd = '',
+        string $serialNoStart = '',
+        string $serialNoEnd = ''
+    ): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $lessionCourse = new LessionCourseTable($this->usercode, $this->cookie);
+        return $lessionCourse->lessionCourse(
+            $semester,
+            $timeModel,
+            $studyCollege,
+            $teachCollege,
+            $courseNature,
+            $courseName,
+            $weekStart,
+            $weekEnd,
+            $dayOfWeekStart,
+            $dayOfWeekEnd,
+            $serialNoStart,
+            $serialNoEnd
+        );
+    }
+
 }

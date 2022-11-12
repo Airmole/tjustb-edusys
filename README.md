@@ -59,6 +59,8 @@ print_r($profile);
 - [查询班级课表](docs/api.md#查询班级课表)
 - [教师课表查询筛选项列表](docs/api.md#%E6%95%99%E5%B8%88%E8%AF%BE%E8%A1%A8%E6%9F%A5%E8%AF%A2%E7%AD%9B%E9%80%89%E9%A1%B9%E5%88%97%E8%A1%A8)
 - [查询教师课表](docs/api.md#%E6%9F%A5%E8%AF%A2%E6%95%99%E5%B8%88%E8%AF%BE%E8%A1%A8)
+- [课程课表查询筛选项列表](docs/api.md#%E8%AF%BE%E7%A8%8B%E5%88%97%E8%A1%A8%E7%AD%9B%E9%80%89%E8%AF%A6%E5%88%97%E8%A1%A8)
+- [查询课程课表](docs/api.md#%E6%9F%A5%E8%AF%A2%E8%AF%BE%E7%A8%8B%E8%AF%BE%E8%A1%A8)
 
 ## 适用学校系统
 
