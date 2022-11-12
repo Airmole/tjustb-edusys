@@ -21,6 +21,8 @@
 - [查询班级课表](#查询班级课表)
 - [教师课表查询筛选项列表](#教师课表查询筛选项列表)
 - [查询教师课表](#查询教师课表)
+- [课程课表查询筛选项列表](#课程列表筛选详列表)
+- [查询课程课表](#查询课程课表)
 
 ---
 
@@ -5305,3 +5307,716 @@ echo json_encode($list);
 ```
 
 </details>
+
+### 课程课表查询筛选项列表
+
+方法：`lessionCourseOptions()`
+
+调用示例：
+
+```php
+use Airmole\TjustbEdusys\Edusys;
+
+$usercode = '123456789'; // 系统账号
+$password = '*********'; // 系统密码
+$edusys = new Edusys();
+$edusys->autoLogin($usercode, $password);
+$list = $edusys->lessionCourseOptions();
+echo json_encode($list);
+```
+
+<details>
+  <summary>返回参数示例</summary>
+
+```json
+{
+    "semester": [
+        {
+            "name": "2022-2023-1",
+            "value": "2022-2023-1",
+            "checked": true
+        },
+        {
+            "name": "2021-2022-2",
+            "value": "2021-2022-2",
+            "checked": false
+        },
+        {
+            "name": "2021-2022-1",
+            "value": "2021-2022-1",
+            "checked": false
+        },
+        {
+            "name": "2020-2021-2",
+            "value": "2020-2021-2",
+            "checked": false
+        },
+        {
+            "name": "2020-2021-1",
+            "value": "2020-2021-1",
+            "checked": false
+        },
+        {
+            "name": "2019-2020-2",
+            "value": "2019-2020-2",
+            "checked": false
+        },
+        {
+            "name": "2019-2020-1",
+            "value": "2019-2020-1",
+            "checked": false
+        },
+        {
+            "name": "2018-2019-2",
+            "value": "2018-2019-2",
+            "checked": false
+        },
+        {
+            "name": "2018-2019-1",
+            "value": "2018-2019-1",
+            "checked": false
+        },
+        {
+            "name": "2017-2018-2",
+            "value": "2017-2018-2",
+            "checked": false
+        },
+        {
+            "name": "2017-2018-1",
+            "value": "2017-2018-1",
+            "checked": false
+        },
+        {
+            "name": "2016-2017-3",
+            "value": "2016-2017-3",
+            "checked": false
+        },
+        {
+            "name": "2016-2017-2",
+            "value": "2016-2017-2",
+            "checked": false
+        },
+        {
+            "name": "2016-2017-1",
+            "value": "2016-2017-1",
+            "checked": false
+        },
+        {
+            "name": "2015-2016-3",
+            "value": "2015-2016-3",
+            "checked": false
+        },
+        {
+            "name": "2015-2016-2",
+            "value": "2015-2016-2",
+            "checked": false
+        },
+        {
+            "name": "2015-2016-1",
+            "value": "2015-2016-1",
+            "checked": false
+        },
+        {
+            "name": "2014-2015-3",
+            "value": "2014-2015-3",
+            "checked": false
+        },
+        {
+            "name": "2014-2015-2",
+            "value": "2014-2015-2",
+            "checked": false
+        },
+        {
+            "name": "2014-2015-1",
+            "value": "2014-2015-1",
+            "checked": false
+        },
+        {
+            "name": "2013-2014-3",
+            "value": "2013-2014-3",
+            "checked": false
+        },
+        {
+            "name": "2013-2014-2",
+            "value": "2013-2014-2",
+            "checked": false
+        },
+        {
+            "name": "2013-2014-1",
+            "value": "2013-2014-1",
+            "checked": false
+        },
+        {
+            "name": "2012-2013-3",
+            "value": "2012-2013-3",
+            "checked": false
+        },
+        {
+            "name": "2012-2013-2",
+            "value": "2012-2013-2",
+            "checked": false
+        },
+        {
+            "name": "2012-2013-1",
+            "value": "2012-2013-1",
+            "checked": false
+        },
+        {
+            "name": "2011-2012-2",
+            "value": "2011-2012-2",
+            "checked": false
+        },
+        {
+            "name": "2011-2012-1",
+            "value": "2011-2012-1",
+            "checked": false
+        },
+        {
+            "name": "2010-2011-3",
+            "value": "2010-2011-3",
+            "checked": false
+        },
+        {
+            "name": "2010-2011-2",
+            "value": "2010-2011-2",
+            "checked": false
+        },
+        {
+            "name": "2010-2011-1",
+            "value": "2010-2011-1",
+            "checked": false
+        },
+        {
+            "name": "2010-2011-0",
+            "value": "2010-2011-0",
+            "checked": false
+        },
+        {
+            "name": "2009-2010-3",
+            "value": "2009-2010-3",
+            "checked": false
+        },
+        {
+            "name": "2009-2010-2",
+            "value": "2009-2010-2",
+            "checked": false
+        },
+        {
+            "name": "2009-2010-1",
+            "value": "2009-2010-1",
+            "checked": false
+        },
+        {
+            "name": "2009-2010-0",
+            "value": "2009-2010-0",
+            "checked": false
+        },
+        {
+            "name": "2008-2009-3",
+            "value": "2008-2009-3",
+            "checked": false
+        },
+        {
+            "name": "2008-2009-2",
+            "value": "2008-2009-2",
+            "checked": false
+        },
+        {
+            "name": "2008-2009-1",
+            "value": "2008-2009-1",
+            "checked": false
+        },
+        {
+            "name": "2007-2008-3",
+            "value": "2007-2008-3",
+            "checked": false
+        },
+        {
+            "name": "2007-2008-2",
+            "value": "2007-2008-2",
+            "checked": false
+        },
+        {
+            "name": "2007-2008-1",
+            "value": "2007-2008-1",
+            "checked": false
+        },
+        {
+            "name": "2006-2007-3",
+            "value": "2006-2007-3",
+            "checked": false
+        },
+        {
+            "name": "2006-2007-2",
+            "value": "2006-2007-2",
+            "checked": false
+        },
+        {
+            "name": "2006-2007-1",
+            "value": "2006-2007-1",
+            "checked": false
+        },
+        {
+            "name": "2005-2006-2",
+            "value": "2005-2006-2",
+            "checked": false
+        },
+        {
+            "name": "2005-2006-1",
+            "value": "2005-2006-1",
+            "checked": false
+        },
+        {
+            "name": "2004-2005-2",
+            "value": "2004-2005-2",
+            "checked": false
+        },
+        {
+            "name": "2004-2005-1",
+            "value": "2004-2005-1",
+            "checked": false
+        },
+        {
+            "name": "2003-2004-2",
+            "value": "2003-2004-2",
+            "checked": false
+        },
+        {
+            "name": "2003-2004-1",
+            "value": "2003-2004-1",
+            "checked": false
+        },
+        {
+            "name": "2002-2003-2",
+            "value": "2002-2003-2",
+            "checked": false
+        },
+        {
+            "name": "2002-2003-1",
+            "value": "2002-2003-1",
+            "checked": false
+        },
+        {
+            "name": "2001-2002-2",
+            "value": "2001-2002-2",
+            "checked": false
+        },
+        {
+            "name": "2001-2002-1",
+            "value": "2001-2002-1",
+            "checked": false
+        },
+        {
+            "name": "2000-2001-2",
+            "value": "2000-2001-2",
+            "checked": false
+        },
+        {
+            "name": "2000-2001-1",
+            "value": "2000-2001-1",
+            "checked": false
+        }
+    ],
+    "timeModel": [
+        {
+            "name": "默认节次模式",
+            "value": "9473F3E0DCAB413BE0535BDCFA0AFB99",
+            "checked": true
+        }
+    ],
+    "studyCollege": [
+        {
+            "name": "-请选择-",
+            "value": "",
+            "checked": true
+        },
+        {
+            "name": "[011]土木工程系",
+            "value": "011",
+            "checked": false
+        },
+        {
+            "name": "[012]环境工程系",
+            "value": "012",
+            "checked": false
+        },
+        {
+            "name": "[013]艺术设计系",
+            "value": "013",
+            "checked": false
+        },
+        {
+            "name": "[02]护理系",
+            "value": "02",
+            "checked": false
+        },
+        {
+            "name": "[022]康复治疗系",
+            "value": "1669097690654C2697E66260C1E678C9",
+            "checked": false
+        },
+        {
+            "name": "[03]材料科学与工程系",
+            "value": "03",
+            "checked": false
+        },
+        {
+            "name": "[04]机械工程系",
+            "value": "04",
+            "checked": false
+        },
+        {
+            "name": "[042]通信工程系",
+            "value": "F367CE0C4668477DA1F3D59B52D1AC43",
+            "checked": false
+        },
+        {
+            "name": "[043]智能制造学院",
+            "value": "DAD1F16577B44F8D9439402F4E8CEADB",
+            "checked": false
+        },
+        {
+            "name": "[051]信息工程系",
+            "value": "051",
+            "checked": false
+        },
+        {
+            "name": "[06]音乐系",
+            "value": "06",
+            "checked": false
+        },
+        {
+            "name": "[062]舞蹈系",
+            "value": "FA5BD4515C4C4FA0987A6FC97C1F94E9",
+            "checked": false
+        },
+        {
+            "name": "[071]经济系",
+            "value": "071",
+            "checked": false
+        },
+        {
+            "name": "[08]法律系",
+            "value": "08",
+            "checked": false
+        },
+        {
+            "name": "[09]外语系",
+            "value": "09",
+            "checked": false
+        },
+        {
+            "name": "[10]无人机系",
+            "value": "091A1730BF0E4621BD53DEFED59D756A",
+            "checked": false
+        },
+        {
+            "name": "[171]管理系",
+            "value": "171",
+            "checked": false
+        },
+        {
+            "name": "[21]武装部",
+            "value": "19E92A97E94D463587B72C954F33DAEF",
+            "checked": false
+        },
+        {
+            "name": "[27]实验室管理中心",
+            "value": "27",
+            "checked": false
+        },
+        {
+            "name": "[35]资产管理中心",
+            "value": "547D47D5D53B4EB1AB09E6E551441C7E",
+            "checked": false
+        },
+        {
+            "name": "[36]保卫处",
+            "value": "7BCD2332A8D04C108B01551417684BF9",
+            "checked": false
+        },
+        {
+            "name": "[43]体育部",
+            "value": "43",
+            "checked": false
+        },
+        {
+            "name": "[44]思想政治部",
+            "value": "44",
+            "checked": false
+        },
+        {
+            "name": "[45]公共教学部",
+            "value": "45",
+            "checked": false
+        },
+        {
+            "name": "[46]劳动学院",
+            "value": "8D689F95650644F5B873356BFB248084",
+            "checked": false
+        },
+        {
+            "name": "[52]基础部",
+            "value": "52",
+            "checked": false
+        }
+    ],
+    "teachCollege": [
+        {
+            "name": "-请选择-",
+            "value": "",
+            "checked": true
+        },
+        {
+            "name": "[011]土木工程系",
+            "value": "011",
+            "checked": false
+        },
+        {
+            "name": "[012]环境工程系",
+            "value": "012",
+            "checked": false
+        },
+        {
+            "name": "[013]艺术设计系",
+            "value": "013",
+            "checked": false
+        },
+        {
+            "name": "[02]护理系",
+            "value": "02",
+            "checked": false
+        },
+        {
+            "name": "[022]康复治疗系",
+            "value": "1669097690654C2697E66260C1E678C9",
+            "checked": false
+        },
+        {
+            "name": "[03]材料科学与工程系",
+            "value": "03",
+            "checked": false
+        },
+        {
+            "name": "[04]机械工程系",
+            "value": "04",
+            "checked": false
+        },
+        {
+            "name": "[042]通信工程系",
+            "value": "F367CE0C4668477DA1F3D59B52D1AC43",
+            "checked": false
+        },
+        {
+            "name": "[043]智能制造学院",
+            "value": "DAD1F16577B44F8D9439402F4E8CEADB",
+            "checked": false
+        },
+        {
+            "name": "[051]信息工程系",
+            "value": "051",
+            "checked": false
+        },
+        {
+            "name": "[06]音乐系",
+            "value": "06",
+            "checked": false
+        },
+        {
+            "name": "[062]舞蹈系",
+            "value": "FA5BD4515C4C4FA0987A6FC97C1F94E9",
+            "checked": false
+        },
+        {
+            "name": "[071]经济系",
+            "value": "071",
+            "checked": false
+        },
+        {
+            "name": "[08]法律系",
+            "value": "08",
+            "checked": false
+        },
+        {
+            "name": "[09]外语系",
+            "value": "09",
+            "checked": false
+        },
+        {
+            "name": "[10]无人机系",
+            "value": "091A1730BF0E4621BD53DEFED59D756A",
+            "checked": false
+        },
+        {
+            "name": "[171]管理系",
+            "value": "171",
+            "checked": false
+        },
+        {
+            "name": "[21]武装部",
+            "value": "19E92A97E94D463587B72C954F33DAEF",
+            "checked": false
+        },
+        {
+            "name": "[23]教务处",
+            "value": "23",
+            "checked": false
+        },
+        {
+            "name": "[24]学生处",
+            "value": "24",
+            "checked": false
+        },
+        {
+            "name": "[26]图书馆",
+            "value": "26",
+            "checked": false
+        },
+        {
+            "name": "[27]实验室管理中心",
+            "value": "27",
+            "checked": false
+        },
+        {
+            "name": "[28]招生就业处",
+            "value": "28",
+            "checked": false
+        },
+        {
+            "name": "[33]国际交流处",
+            "value": "33",
+            "checked": false
+        },
+        {
+            "name": "[35]资产管理中心",
+            "value": "547D47D5D53B4EB1AB09E6E551441C7E",
+            "checked": false
+        },
+        {
+            "name": "[36]保卫处",
+            "value": "7BCD2332A8D04C108B01551417684BF9",
+            "checked": false
+        },
+        {
+            "name": "[43]体育部",
+            "value": "43",
+            "checked": false
+        },
+        {
+            "name": "[44]思想政治部",
+            "value": "44",
+            "checked": false
+        },
+        {
+            "name": "[45]公共教学部",
+            "value": "45",
+            "checked": false
+        },
+        {
+            "name": "[46]劳动学院",
+            "value": "8D689F95650644F5B873356BFB248084",
+            "checked": false
+        },
+        {
+            "name": "[52]基础部",
+            "value": "52",
+            "checked": false
+        }
+    ],
+    "courseNature": [
+        {
+            "name": "-请选择-",
+            "value": "",
+            "checked": true
+        },
+        {
+            "name": "必修",
+            "value": "1",
+            "checked": false
+        },
+        {
+            "name": "限选",
+            "value": "2",
+            "checked": false
+        },
+        {
+            "name": "公选",
+            "value": "4",
+            "checked": false
+        },
+        {
+            "name": "专选（必选）",
+            "value": "5",
+            "checked": false
+        },
+        {
+            "name": "专选（自选）",
+            "value": "6",
+            "checked": false
+        },
+        {
+            "name": "其它",
+            "value": "9",
+            "checked": false
+        }
+    ]
+}
+```
+
+</details>
+
+---
+
+### 查询课程课表
+
+> 部分上课班级信息与课程名称混在一起，难以分离，因此返回信息暂不返回上课班级名称
+
+方法：`lessionCourse()`
+
+所需参数：
+
+| para           | type   | nullable | default | tips                                   |
+| -------------- | ------ | -------- | ------- | -------------------------------------- |
+| semester       | string | ❌        | ❌       | 学年学期，不可为空，例2022-2023-1                 |
+| timeModel      | string | ❌        | ❌       | 时间模式，请求[课程课表查询筛选项列表](#课程课表查询筛选项列表)接口获取 |
+| studyCollege   | string | ✅        | ''      | 院系，请求[课程课表查询筛选项列表](#课程课表查询筛选项列表)接口获取   |
+| teachCollege   | string | ✅        | ''      | 开课院系，请求[课程课表查询筛选项列表](#课程课表查询筛选项列表)接口获取 |
+| courseNature   | string | ✅        | ''      | 课程属性，请求[课程课表查询筛选项列表](#课程课表查询筛选项列表)接口获取 |
+| courseName     | string | ✅        | ''      | 课程名称                                   |
+| weekStart      | string | ✅        | ''      | 开始周（值1~30）                             |
+| weekEnd        | string | ✅        | ''      | 结束周（值1~30）                             |
+| dayOfWeekStart | string | ✅        | ''      | 开始星期几(值1~7)                            |
+| dayOfWeekEnd   | string | ✅        | ''      | 结束星期几(值1~7)                            |
+| serialNoStart  | string | ✅        | ''      | 开始节数                                   |
+| serialNoEnd    | string | ✅        | ''      | 结束节数                                   |
+
+调用示例：
+
+```php
+use Airmole\TjustbEdusys\Edusys;
+
+$usercode = '123456789'; // 系统账号
+$password = '*********'; // 系统密码
+$edusys = new Edusys();
+$edusys->autoLogin($usercode, $password);
+$semester = '2022-2023-1';
+$timeModel = $edusys->lessionCourseOptions()['timeModel'][0]['value'];
+$courseName = '大学语文';
+$list = $edusys->lessionCourse(
+            $semester,
+            $timeModel,
+            '',
+            '',
+            '',
+            $courseName,
+            ‘’,
+            ‘’,
+            ‘’,
+            '',
+            '',
+            ''
+        );
+echo json_encode($list);
+```
+
+---
