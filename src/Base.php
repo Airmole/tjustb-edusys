@@ -36,6 +36,21 @@ class Base
     public string $cookie;
 
     /**
+     * 星期几
+     */
+    public const WEEKS_ARRAY = ['一', '二', '三', '四', '五', '六', '日'];
+
+    /**
+     * 开始上课时间
+     */
+    public const START_ATS = ['08:00', '09:55', '13:10', '15:00', '16:50', '19:10'];
+
+    /**
+     * 下课时间
+     */
+    public const END_ATS = ['09:35', '11:30', '14:45', '16:35', '18:25', '21:35'];
+
+    /**
      * @throws Exception
      */
     public function __construct()
