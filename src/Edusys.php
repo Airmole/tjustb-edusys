@@ -420,4 +420,153 @@ class Edusys
         );
     }
 
+    /**
+     * 教室借用情况筛选项
+     * @return array
+     * @throws Exception
+     */
+    public function classroomStatusOptions(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $classroom = new Classroom($this->usercode, $this->cookie);
+        return $classroom->options();
+    }
+
+    /**
+     * 教室状态查询及详情所需参数
+     * @param string $semester 学年学期
+     * @param string $timeModel 时间模式
+     * @param string $schoolArea 校区
+     * @param string $teachArea 教学区
+     * @param string $classroomType 教室类型
+     * @param string $teachBuilding 教学楼
+     * @param string $classroomCode 教室
+     * @param string $peopleSign 容纳人数比较符号
+     * @param string $peopleNum 容纳人数
+     * @param string $classroomStatus 教室状态
+     * @param string $borrowCollege 借用院系
+     * @param string $weekStart 开始周（值1~30）
+     * @param string $weekEnd 结束周（值1~30）
+     * @param string $dayOfWeekStart 开始星期几（值1~7）
+     * @param string $dayOfWeekEnd 结束星期几（值1~7）
+     * @param string $serialNoStart 开始节数
+     * @param string $serialNoEnd 结束节数
+     * @param string $classroomOwned 教室所属单位
+     * @return array[]
+     * @throws Exception
+     */
+    public function classroomStatus(
+        string $semester = '',
+        string $timeModel = '',
+        string $schoolArea = '',
+        string $teachArea = '',
+        string $classroomType = '',
+        string $teachBuilding = '',
+        string $classroomCode = '',
+        string $peopleSign = '',
+        string $peopleNum = '',
+        string $classroomStatus = '',
+        string $borrowCollege = '',
+        string $weekStart = '',
+        string $weekEnd = '',
+        string $dayOfWeekStart = '',
+        string $dayOfWeekEnd = '',
+        string $serialNoStart = '',
+        string $serialNoEnd = '',
+        string $classroomOwned = ''
+    ): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $classroom = new Classroom($this->usercode, $this->cookie);
+        return $classroom->classroom(
+            $semester,
+            $timeModel,
+            $schoolArea,
+            $teachArea,
+            $classroomType,
+            $teachBuilding,
+            $classroomCode,
+            $peopleSign,
+            $peopleNum,
+            $classroomStatus,
+            $borrowCollege,
+            $weekStart,
+            $weekEnd,
+            $dayOfWeekStart,
+            $dayOfWeekEnd,
+            $serialNoStart,
+            $serialNoEnd,
+            $classroomOwned
+        );
+    }
+
+    /**
+     * 教学地点列表（教学区、教学楼、教室）
+     * @param string $type 类型：area-教学区，building-教学楼，classroom-教室
+     * @return array
+     * @throws Exception
+     */
+    public function classroomList(string $type = 'classroom'): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $classroom = new Classroom($this->usercode, $this->cookie);
+        return $classroom->classroomList($type);
+    }
+
+    /**
+     * 获取教室借用详情信息
+     * @param string $semester 学年学期
+     * @param string $timeModel 时间模式
+     * @param string $classroomCode 教室编码
+     * @param string $serialValue 节次序号
+     * @param string $dayOfWeek 星期几
+     * @param string $startAt 开始时间
+     * @param string $endAt 结束时间
+     * @param string $dayOfWeekStart 开始星期几（值1~7）
+     * @param string $dayOfWeekEnd 结束星期几（值1~7）
+     * @param string $weekStart 开始周（值1~30）
+     * @param string $weekEnd 结束周（值1~30）
+     * @param string $serialNoStart 开始节数
+     * @param string $serialNoEnd 结束节数
+     * @param string $classroomStatus 教室状态
+     * @return array
+     * @throws Exception
+     */
+    public function classroomDetail(
+        string $semester = '',
+        string $timeModel = '',
+        string $classroomCode = '',
+        string $serialValue = '',
+        string $dayOfWeek = '',
+        string $startAt = '',
+        string $endAt = '',
+        string $dayOfWeekStart = '1',
+        string $dayOfWeekEnd = '7',
+        string $weekStart = '',
+        string $weekEnd = '',
+        string $serialNoStart = '',
+        string $serialNoEnd = '',
+        string $classroomStatus = ''
+    ): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $classroom = new Classroom($this->usercode, $this->cookie);
+        return $classroom->classroomDetail(
+            $semester,
+            $timeModel,
+            $classroomCode,
+            $serialValue,
+            $dayOfWeek,
+            $startAt,
+            $endAt,
+            $dayOfWeekStart,
+            $dayOfWeekEnd,
+            $weekStart,
+            $weekEnd,
+            $serialNoStart,
+            $serialNoEnd,
+            $classroomStatus
+        );
+    }
+
 }

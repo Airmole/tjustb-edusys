@@ -162,18 +162,15 @@ class ClassCourseTable extends Base
         $classDayCourses = [];
         $rowIndex = 0;
         $weekIndex = 0;
-        $weeksArray = ['一', '二', '三', '四', '五', '六', '日'];
-        $startAts = ['08:00', '09:55', '13:10', '15:00', '16:50', '19:10'];
-        $endAts = ['09:35', '11:30', '14:45', '16:35', '18:25', '21:35'];
         foreach ($tdHtmls as $tdIndex => $tdHtml) {
             $className = $classNames[$rowIndex];
             $remainder = $tdIndex % 6;
-            $startAt = $startAts[$remainder];
-            $endAt = $endAts[$remainder];
+            $startAt = self::START_ATS[$remainder];
+            $endAt = self::END_ATS[$remainder];
             $classCourseList[] = $this->formatCellCourse($tdHtml, $className, $startAt, $endAt);
             if (count($classCourseList) === 6) {
                 $classDayCourses[$weekIndex]['items'] = $classCourseList;
-                $classDayCourses[$weekIndex]['title'] = "星期{$weeksArray[$weekIndex]}";
+                $classDayCourses[$weekIndex]['title'] = "星期" . self::WEEKS_ARRAY[$weekIndex];
                 $classCourseList = [];
                 $weekIndex++;
             }
