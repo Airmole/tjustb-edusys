@@ -78,10 +78,10 @@ class Login extends Base
      */
     public function getCookie(): string
     {
-        $html = $this->httpGet('/jsxsd/', '', '', 5, true);
+        $html = $this->httpGet('/', '', '', 5, true);
         if ($html['code'] == 0 || $html['code'] >= 400) return '';
         $response = $html['data'];
-        preg_match('/Set-Cookie: JSESSIONID=(.*); Path=\/jsxsd;/i', $response, $cookie);
+        preg_match('/Set-Cookie: JSESSIONID=(.*); Path=\//i', $response, $cookie);
         preg_match('/Set-Cookie: SERVERID=(.*); path=\//i', $response, $serverid);
         $jsessionidStr = '';
         $serveridStr = '';
@@ -101,8 +101,8 @@ class Login extends Base
      */
     public function getCaptcha(string $cookie): string
     {
-        $referer = $this->edusysUrl . '/jsxsd/';
-        $response = $this->httpGet('/jsxsd/verifycode.servlet', $cookie, $referer);
+        $referer = $this->edusysUrl . '/';
+        $response = $this->httpGet('/verifycode.servlet', $cookie, $referer);
         if ($response['code'] == 0 || $response['code'] >= 400) return '';
         return base64_encode($response['data']);
     }
@@ -129,18 +129,21 @@ class Login extends Base
      */
     public function login(string $usercode, string $password, string $captcha, string $cookie): array
     {
-        $usercode = base64_encode(trim($usercode));
-        $password = base64_encode(trim($password));
+        $logonSess = $this->httpPost($this->edusysUrl . '/Logon.do?method=logon&flag=sess', '', $cookie);
+        $encoded = $this->signLoginFormValue($logonSess['data'], $usercode, $password);
         $captcha = trim($captcha);
-        $referer = $this->edusysUrl . '/jsxsd/';
-        $url = $this->edusysUrl . '/jsxsd/xk/LoginToXk';
-        $post = "userAccount=&userPassword=&RANDOMCODE={$captcha}&encoded={$usercode}%25%25%25{$password}";
-        $response = $this->httpPost($url, $post, $cookie, $referer);
-        if ($response['code'] == 0 || $response['code'] >= 400) return ['code' => (int)$response['code'], 'data' => '系统异常,稍后再试'];
+        $post = "userAccount=&userPassword=&RANDOMCODE={$captcha}&encoded={$encoded}";
+
+        $response = $this->httpLoginPost($this->edusysUrl, $cookie, $post);
+        if ($response['code'] != 302) return ['code' => (int)$response['code'], 'data' => '系统异常,稍后再试'];
         if (strpos($response['data'], '验证码错误')) return ['code' => 403, 'data' => '验证码错误'];
         if (strpos($response['data'], '验证码不能为空')) return ['code' => 403, 'data' => '验证码不能为空'];
         if (strpos($response['data'], '用户名或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
-        $this->cookie = $cookie;
+        if (strpos($response['data'], '该帐号不存在或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
+        $redirectResponse = $this->httpGetFollowLocation($this->edusysUrl, $this->loginedLocationUrl($response['data']));
+        $this->httpGet('/jsxsd/framework/xsMain.jsp', $redirectResponse['cookie'], $this->edusysUrl. '/');
+        $cookie = $redirectResponse['cookie'];
+        $this->cookie = $redirectResponse['cookie'];
         $this->usercode = $usercode;
         return ['code' => 200, 'data' => $cookie];
     }
@@ -181,6 +184,118 @@ class Login extends Base
         $url = $this->edusysUrl . '/jsxsd/grsz/grsz_xgmm';
         $post = "id=&oldpassword={$nowPwd}&password1={$newPwd}&password2={$repeatNewpwd}&upt=1";
         return $this->httpPost($url, $post, $cookie);
+    }
+
+    /**
+     * 计算登录表单提交签名值
+     * @param string $sess
+     * @param string $usercode
+     * @param string $password
+     * @return void
+     */
+    public function signLoginFormValue(string $sess, string $usercode, string $password): string {
+        list($scode, $sxh) = explode("#", $sess);
+        $code = $usercode . "%%%" . $password;
+        $encoded = "";
+
+        for ($i = 0; $i < strlen($code); $i++) {
+            if ($i < 20) {
+                $encoded .= substr($code, $i, 1) . substr($scode, 0, intval(substr($sxh, $i, 1)));
+                $scode = substr($scode, intval(substr($sxh, $i, 1)), strlen($scode));
+            } else {
+                $encoded .= substr($code, $i, strlen($code));
+                $i = strlen($code);
+            }
+        }
+
+        return urlencode($encoded);
+    }
+
+    /**
+     * 登录成功重定向链接
+     * @param string $response
+     * @return string
+     */
+    public function loginedLocationUrl(string $response) : string {
+        preg_match('/Location: (.*)?/', $response, $resultUrl);
+        return $this->stripBlankspace($resultUrl[1]);
+    }
+
+    /**
+     * 新post请求登录方法
+     * @param string $domain
+     * @param string $cookie
+     * @param string $post
+     * @return array
+     */
+    public function httpLoginPost(string $domain, string $cookie, string $post): array
+    {
+        $url = $domain . '/Logon.do?method=logon';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language: zh-CN,zh;q=0.9',
+            'Cache-Control: no-cache',
+            'Connection: keep-alive',
+            'Content-Type: application/x-www-form-urlencoded',
+            "Origin: {$domain}",
+            'Pragma: no-cache',
+            "Referer: {$domain}/",
+            'Upgrade-Insecure-Requests: 1',
+            'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
+        ]);
+        curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch,CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return ['code' => $httpCode, 'data' => $response];
+    }
+
+    /**
+     * 登录成功专用重定向方法
+     * @param string $referer
+     * @param string $url
+     * @return array
+     */
+    public function httpGetFollowLocation(string $referer, string $url) {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_HEADER => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Accept-Language: zh-CN,zh;q=0.9',
+                'Cache-Control: no-cache',
+                'Connection: keep-alive',
+                'Pragma: no-cache',
+                "Referer: {$referer}/",
+                'Upgrade-Insecure-Requests: 1',
+                'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        preg_match('/Set-Cookie: JSESSIONID=(.*); Path=\/jsxsd;/i', $response, $cookie);
+        $cookie = !empty($cookie[1]) ? $cookie[1] : '';
+
+        return ['code' => $httpCode, 'data' => $response, 'cookie' => "JSESSIONID={$cookie}"];
     }
 
 }

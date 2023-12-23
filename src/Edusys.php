@@ -43,7 +43,7 @@ class Edusys
         $result = $login->login($usercode, $password, $captcha, $cookie);
         if ($result['code'] === Base::CODE_SUCCESS) {
             $this->usercode = $usercode;
-            $this->cookie = $cookie;
+            $this->cookie = $result['data'];
         }
         return $result;
     }
