@@ -70,7 +70,7 @@ class Base
     public function setEdusysUrl(array $urls = [])
     {
         if (empty($urls)) {
-            $urls = ['http://117.131.241.67:89', 'http://61.181.145.1:89', 'http://jiaowu.airmole.cn:808'];
+            $urls = ['http://61.181.145.1:89', 'http://111.33.33.139:89'];
         }
 
         foreach ($urls as $url) {
