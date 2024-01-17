@@ -57,6 +57,10 @@ class Login extends Base
             $captcha = $this->captchaOcr($loginPara['captcha']);
             $response = $this->login($usercode, $password, $captcha, $loginPara['cookie']);
             if ($response['code'] === 200) return $response;
+            if ($response['code'] == 403 && strpos($response['data'], '验证码') !== false) {
+                continue;
+            }
+            throw new Exception($response['data']);
         }
         throw new Exception('验证码识别多次失败，建议手动登录');
     }
@@ -64,6 +68,7 @@ class Login extends Base
     /**
      * 获取登录所需参数
      * @return array
+     * @throws Exception
      */
     public function getLoginPara(): array
     {
@@ -75,6 +80,7 @@ class Login extends Base
     /**
      * 获取教务cookie值
      * @return string
+     * @throws Exception
      */
     public function getCookie(): string
     {
@@ -90,20 +96,22 @@ class Login extends Base
         if (!empty($cookie[1]) && !empty($serverid[1])) $separator = '; ';
         if (!empty($serverid[1])) $serveridStr = "SERVERID={$serverid[1]}";
         $cookieStr = $jsessionidStr . $separator . $serveridStr;
-        if (!empty($cookieStr)) return $cookieStr;
-        return '';
+
+        if (empty($cookieStr)) throw new Exception('获取cookie失败');
+        return $cookieStr;
     }
 
     /**
      * 获取验证码（Base64返回）
      * @param string $cookie
      * @return string
+     * @throws Exception
      */
     public function getCaptcha(string $cookie): string
     {
         $referer = $this->edusysUrl . '/';
         $response = $this->httpGet('/verifycode.servlet', $cookie, $referer);
-        if ($response['code'] == 0 || $response['code'] >= 400) return '';
+        if ($response['code'] == 0 || $response['code'] >= 400) throw new Exception('获取验证码失败');
         return base64_encode($response['data']);
     }
 
@@ -126,22 +134,26 @@ class Login extends Base
      * @param string $captcha 验证码
      * @param string $cookie cookie
      * @return array
+     * @throws Exception
      */
     public function login(string $usercode, string $password, string $captcha, string $cookie): array
     {
         $logonSess = $this->httpPost($this->edusysUrl . '/Logon.do?method=logon&flag=sess', '', $cookie);
+        if ($logonSess['code'] != 200) throw new Exception('获取登录秘钥失败');
         $encoded = $this->signLoginFormValue($logonSess['data'], $usercode, $password);
         $captcha = trim($captcha);
         $post = "userAccount=&userPassword=&RANDOMCODE={$captcha}&encoded={$encoded}";
 
         $response = $this->httpLoginPost($this->edusysUrl, $cookie, $post);
-        if ($response['code'] != 302) return ['code' => (int)$response['code'], 'data' => '系统异常,稍后再试'];
         if (strpos($response['data'], '验证码错误')) return ['code' => 403, 'data' => '验证码错误'];
         if (strpos($response['data'], '验证码不能为空')) return ['code' => 403, 'data' => '验证码不能为空'];
         if (strpos($response['data'], '用户名或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '该帐号不存在或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
-        $redirectResponse = $this->httpGetFollowLocation($this->edusysUrl, $this->loginedLocationUrl($response['data']));
-        $this->httpGet('/jsxsd/framework/xsMain.jsp', $redirectResponse['cookie'], $this->edusysUrl. '/');
+        if (strpos($response['data'], '该帐号已锁定')) return ['code' => 403, 'data' => '错误次数过多账号锁定，请半小时后再试'];
+        if ($response['code'] != 302) throw new Exception('login系统异常,请联系开发者');
+        $redirectResponse = $this->httpGetFollowLocation($this->edusysUrl, $this->loginedLocationUrl($response['data']), $cookie);
+        $mainBoard = $this->httpGet('/jsxsd/framework/xsMain.jsp', $redirectResponse['cookie'], $this->edusysUrl. '/');
+        if ($mainBoard['code'] != 200) throw new Exception('访问主界面异常失败');
         $cookie = $redirectResponse['cookie'];
         $this->cookie = $redirectResponse['cookie'];
         $this->usercode = $usercode;
@@ -262,9 +274,11 @@ class Login extends Base
      * 登录成功专用重定向方法
      * @param string $referer
      * @param string $url
+     * @param string $cookie
      * @return array
      */
-    public function httpGetFollowLocation(string $referer, string $url) {
+    public function httpGetFollowLocation(string $referer, string $url, string $cookie): array
+    {
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => $url,
@@ -283,6 +297,7 @@ class Login extends Base
                 'Connection: keep-alive',
                 'Pragma: no-cache',
                 "Referer: {$referer}/",
+                "Cookie: {$cookie}",
                 'Upgrade-Insecure-Requests: 1',
                 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
             ),
@@ -292,10 +307,10 @@ class Login extends Base
         $httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        preg_match('/Set-Cookie: JSESSIONID=(.*); Path=\/jsxsd;/i', $response, $cookie);
-        $cookie = !empty($cookie[1]) ? $cookie[1] : '';
+        preg_match('/Set-Cookie: JSESSIONID=(.*); Path=\/jsxsd;/i', $response, $newCookie);
+        $newCookie = !empty($newCookie[1]) ? $newCookie[1] : '';
 
-        return ['code' => $httpCode, 'data' => $response, 'cookie' => "JSESSIONID={$cookie}"];
+        return ['code' => $httpCode, 'data' => $response, 'cookie' => "JSESSIONID={$newCookie}; {$cookie}"];
     }
 
 }

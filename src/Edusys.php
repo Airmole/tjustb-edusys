@@ -36,6 +36,7 @@ class Edusys
      * @param string $captcha
      * @param string $cookie
      * @return array
+     * @throws Exception
      */
     public function selfLogin(string $usercode, string $password, string $captcha, string $cookie): array
     {

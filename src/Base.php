@@ -51,7 +51,6 @@ class Base
     public const END_ATS = ['09:35', '11:30', '14:45', '16:35', '18:25', '21:35'];
 
     /**
-     * @throws Exception
      */
     public function __construct()
     {
@@ -63,24 +62,13 @@ class Base
 
     /**
      * 设置可用教务URL
-     * @param array $urls 教务系统URL配置数组
+     * @param string $url
      * @return void
-     * @throws Exception 教务系统关闭抛出异常
      */
-    public function setEdusysUrl(array $urls = [])
+    public function setEdusysUrl(string $url = 'http://111.33.33.139:89')
     {
-        if (empty($urls)) {
-            $urls = ['http://61.181.145.1:89', 'http://111.33.33.139:89'];
-        }
-
-        foreach ($urls as $url) {
-            $code = $this->getEdusysStatusCode($url);
-            if ($code === 200) {
-                $this->edusysUrl = $url;
-                return;
-            }
-        }
-        if (empty($this->edusysUrl)) throw new Exception('教务系统未开启？');
+        if (empty($url)) $url = 'http://111.33.33.139:89';
+        $this->edusysUrl = $url;
     }
 
     /**
@@ -128,7 +116,7 @@ class Base
      * @param string $url 教务系统URL
      * @return void
      */
-    public function setEdusysUrlForce(string $url = 'http://61.181.145.1:89')
+    public function setEdusysUrlForce(string $url = 'http://111.33.33.139:89')
     {
         $this->edusysUrl = $url;
     }

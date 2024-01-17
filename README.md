@@ -26,10 +26,10 @@ $edusys->autoLogin($usercode, $password); // 自动识别验证码登录，需�
 // $loginPara = $edusys->getLoginPara(); // 获取登录所需参数：cookie，captcha
 // $captchaText为验证码识别结果值
 // $edusys->selfLogin($usercode, $password, $captchaText, $loginPara['cookie']); 
-$profile = $edusys->score(); // 查询成绩
+$score = $edusys->score(); // 查询成绩
 // 注销登录系统，建议每次获取完所需数据后注销登录，以免多处登录出现获取失败问题。
 $edusys->logout();
-print_r($profile);
+print_r($score);
 ```
 
 # API
