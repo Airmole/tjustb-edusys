@@ -78,6 +78,7 @@ class TeacherCourseTable extends Base
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
      * @param string $serialNoStart 开始节数
      * @param string $serialNoEnd 结束节数
+     * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
      */
@@ -92,7 +93,8 @@ class TeacherCourseTable extends Base
         string $dayOfWeekStart = '',
         string $dayOfWeekEnd = '',
         string $serialNoStart = '',
-        string $serialNoEnd = ''
+        string $serialNoEnd = '',
+        int $timeout = 30
     ): array
     {
         $postPara = [
@@ -112,7 +114,7 @@ class TeacherCourseTable extends Base
         $post = http_build_query($postPara);
         $referer = $this->edusysUrl . '/jsxsd/kbcx/kbxx_teacher';
 
-        $html = $this->httpPost('/jsxsd/kbcx/kbxx_teacher_ifr', $post, $this->cookie, $referer);
+        $html = $this->httpPost('/jsxsd/kbcx/kbxx_teacher_ifr', $post, $this->cookie, $referer, $timeout);
         $vaildHtml = $this->checkCookieByHtml($html['data']);
         if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');

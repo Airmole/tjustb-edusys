@@ -99,8 +99,9 @@ class ClassCourseTable extends Base
      * @param string $weekEnd 结束周（值1~30）
      * @param string $dayOfWeekStart 开始星期几（值1~7）
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
-     * @param string $serialNoStart 开始节数
-     * @param string $serialNoEnd 结束节数
+     * @param string $serialNoStart 开始节数（暂不生效）
+     * @param string $serialNoEnd 结束节数（暂不生效）
+     * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
      */
@@ -116,7 +117,8 @@ class ClassCourseTable extends Base
         string $dayOfWeekStart = '',
         string $dayOfWeekEnd = '',
         string $serialNoStart = '',
-        string $serialNoEnd = ''
+        string $serialNoEnd = '',
+        int $timeout = 30
     ): array
     {
         $postPara = [
@@ -131,12 +133,12 @@ class ClassCourseTable extends Base
             'zc2'      => $weekEnd,
             'skxq1'    => $dayOfWeekStart,
             'skxq2'    => $dayOfWeekEnd,
-            'jc1'      => $serialNoStart,
-            'jc2'      => $serialNoEnd
+            // 'jc1'      => $serialNoStart,
+            // 'jc2'      => $serialNoEnd
         ];
         $post = http_build_query($postPara);
         $referer = $this->edusysUrl . '/jsxsd/kbcx/kbxx_xzb';
-        $html = $this->httpPost('/jsxsd/kbcx/kbxx_xzb_ifr', $post, $this->cookie, $referer);
+        $html = $this->httpPost('/jsxsd/kbcx/kbxx_xzb_ifr', $post, $this->cookie, $referer, $timeout);
         $vaildHtml = $this->checkCookieByHtml($html['data']);
         if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');

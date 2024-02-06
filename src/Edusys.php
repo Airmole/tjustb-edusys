@@ -264,6 +264,7 @@ class Edusys
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
      * @param string $serialNoStart 开始节数
      * @param string $serialNoEnd 结束节数
+     * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
      */
@@ -279,7 +280,8 @@ class Edusys
         string $dayOfWeekStart = '',
         string $dayOfWeekEnd = '',
         string $serialNoStart = '',
-        string $serialNoEnd = ''
+        string $serialNoEnd = '',
+        int $timeout = 30
     ): array
     {
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
@@ -296,7 +298,8 @@ class Edusys
             $dayOfWeekStart,
             $dayOfWeekEnd,
             $serialNoStart,
-            $serialNoEnd
+            $serialNoEnd,
+            $timeout
         );
     }
 
@@ -339,7 +342,8 @@ class Edusys
         string $dayOfWeekStart = '',
         string $dayOfWeekEnd = '',
         string $serialNoStart = '',
-        string $serialNoEnd = ''
+        string $serialNoEnd = '',
+        int $timeout = 30
     ): array
     {
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
@@ -355,7 +359,8 @@ class Edusys
             $dayOfWeekStart,
             $dayOfWeekEnd,
             $serialNoStart,
-            $serialNoEnd
+            $serialNoEnd,
+            $timeout
         );
     }
 
