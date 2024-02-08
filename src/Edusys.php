@@ -317,17 +317,18 @@ class Edusys
 
     /**
      * 教师课表查询
-     * @param string $semester
-     * @param string $timeModel
-     * @param string $college
-     * @param string $teacherLevel
-     * @param string $teacherName
-     * @param string $weekStart
-     * @param string $weekEnd
-     * @param string $dayOfWeekStart
-     * @param string $dayOfWeekEnd
-     * @param string $serialNoStart
-     * @param string $serialNoEnd
+     * @param string $semester 学年学期 2022-2023-1
+     * @param string $timeModel 时间模式
+     * @param string $college 院系
+     * @param string $teacherLevel 教师职称
+     * @param string $teacherName 教师姓名
+     * @param string $weekStart 开始周（值1~30）
+     * @param string $weekEnd 结束周（值1~30）
+     * @param string $dayOfWeekStart 开始星期几（值1~7）
+     * @param string $dayOfWeekEnd 结束星期几（值1~7）
+     * @param string $serialNoStart 开始节数
+     * @param string $serialNoEnd 结束节数
+     * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
      */
@@ -369,11 +370,11 @@ class Edusys
      * @return array
      * @throws Exception
      */
-    public function lessionCourseOptions(): array
+    public function lessonCourseOptions(): array
     {
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
-        $lessionCourse = new LessionCourseTable($this->usercode, $this->cookie);
-        return $lessionCourse->options();
+        $lessonCourse = new LessonCourseTable($this->usercode, $this->cookie);
+        return $lessonCourse->options();
     }
 
     /**
@@ -393,7 +394,7 @@ class Edusys
      * @return array
      * @throws Exception
      */
-    public function lessionCourse(
+    public function lessonCourse(
         string $semester = '',
         string $timeModel = '',
         string $studyCollege = '',
@@ -409,8 +410,8 @@ class Edusys
     ): array
     {
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
-        $lessionCourse = new LessionCourseTable($this->usercode, $this->cookie);
-        return $lessionCourse->lessionCourse(
+        $lessonCourse = new LessonCourseTable($this->usercode, $this->cookie);
+        return $lessonCourse->lessonCourse(
             $semester,
             $timeModel,
             $studyCollege,

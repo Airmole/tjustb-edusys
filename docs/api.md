@@ -5314,7 +5314,7 @@ echo json_encode($list);
 
 ### 课程课表查询筛选项列表
 
-方法：`lessionCourseOptions()`
+方法：`lessonCourseOptions()`
 
 调用示例：
 
@@ -5325,7 +5325,7 @@ $usercode = '123456789'; // 系统账号
 $password = '*********'; // 系统密码
 $edusys = new Edusys();
 $edusys->autoLogin($usercode, $password);
-$list = $edusys->lessionCourseOptions();
+$list = $edusys->lessonCourseOptions();
 echo json_encode($list);
 ```
 
@@ -5975,7 +5975,7 @@ echo json_encode($list);
 
 > 部分上课班级信息与课程名称混在一起，难以分离，因此返回信息暂不返回上课班级名称
 
-方法：`lessionCourse()`
+方法：`lessonCourse()`
 
 所需参数：
 
@@ -6004,9 +6004,9 @@ $password = '*********'; // 系统密码
 $edusys = new Edusys();
 $edusys->autoLogin($usercode, $password);
 $semester = '2022-2023-1';
-$timeModel = $edusys->lessionCourseOptions()['timeModel'][0]['value'];
+$timeModel = $edusys->lessonCourseOptions()['timeModel'][0]['value'];
 $courseName = '大学语文';
-$list = $edusys->lessionCourse(
+$list = $edusys->lessonCourse(
             $semester,
             $timeModel,
             '',
@@ -7976,4 +7976,5 @@ echo json_encode($list);
     ]
 ]
 ```
+
 </details>

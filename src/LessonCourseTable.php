@@ -7,7 +7,7 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 课程课表查询
  */
-class LessionCourseTable extends Base
+class LessonCourseTable extends Base
 {
     /**
      * 初始化
@@ -96,7 +96,7 @@ class LessionCourseTable extends Base
      * @return array
      * @throws Exception
      */
-    public function lessionCourse(
+    public function lessonCourse(
         string $semester = '',
         string $timeModel = '',
         string $studyCollege = '',
@@ -133,7 +133,7 @@ class LessionCourseTable extends Base
         if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         $html = $this->stripBlankspace($html['data']);
-        return $this->formatLessionCourseTables($html);
+        return $this->formatLessonCourseTables($html);
     }
 
     /**
@@ -141,35 +141,35 @@ class LessionCourseTable extends Base
      * @param string $html
      * @return array
      */
-    public function formatLessionCourseTables(string $html)
+    public function formatLessonCourseTables(string $html)
     {
-        preg_match_all('/center"><nobr>(.*?)<\/nobr><\/td/', $html, $lessionNames);
-        $lessionNames = $lessionNames ? $lessionNames[1] : [];
+        preg_match_all('/center"><nobr>(.*?)<\/nobr><\/td/', $html, $lessonNames);
+        $lessonNames = $lessonNames ? $lessonNames[1] : [];
 
         preg_match_all('/top">(.*?)<\/td/', $html, $tdHtmls);
         $tdHtmls = $tdHtmls ? $tdHtmls[1] : [];
 
         $rows = [];
-        $lessionCourseList = [];
+        $lessonCourseList = [];
         $classDayCourses = [];
         $rowIndex = 0;
         $weekIndex = 0;
         foreach ($tdHtmls as $tdIndex => $tdHtml) {
-            $lessionName = $lessionNames[$rowIndex];
+            $lessonName = $lessonNames[$rowIndex];
             $remainder = $tdIndex % 6;
             $startAt = self::START_ATS[$remainder];
             $endAt = self::END_ATS[$remainder];
-            $lessionCourseList[] = $this->formatCellCourse($tdHtml, $lessionName, $startAt, $endAt);
-            if (count($lessionCourseList) === 6) {
-                $classDayCourses[$weekIndex]['items'] = $lessionCourseList;
+            $lessonCourseList[] = $this->formatCellCourse($tdHtml, $lessonName, $startAt, $endAt);
+            if (count($lessonCourseList) === 6) {
+                $classDayCourses[$weekIndex]['items'] = $lessonCourseList;
                 $classDayCourses[$weekIndex]['title'] = "星期" . self::WEEKS_ARRAY[$weekIndex];
-                $lessionCourseList = [];
+                $lessonCourseList = [];
                 $weekIndex++;
             }
             if ((42 * ($rowIndex + 1)) - 1 === $tdIndex) {
-                $rows[$rowIndex]['teacherName'] = $lessionName;
+                $rows[$rowIndex]['teacherName'] = $lessonName;
                 $rows[$rowIndex]['course'] = $classDayCourses;
-                $lessionCourseList = [];
+                $lessonCourseList = [];
                 $classDayCourses = [];
                 $weekIndex = 0;
                 $rowIndex++;
@@ -182,12 +182,12 @@ class LessionCourseTable extends Base
     /**
      * 匹配解析单元格课程
      * @param string $html
-     * @param string $lessionName
+     * @param string $lessonName
      * @param string $startAt
      * @param string $endAt
      * @return array
      */
-    public function formatCellCourse(string $html, string $lessionName = '', string $startAt = '', string $endAt = ''): array
+    public function formatCellCourse(string $html, string $lessonName = '', string $startAt = '', string $endAt = ''): array
     {
         $course = [];
         if (empty($this->stripHtmlTagAndBlankspace($html))) return $course;
