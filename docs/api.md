@@ -6029,7 +6029,7 @@ echo json_encode($list);
 ```json
 [
     {
-        "teacherName": "大学语文A",
+        "Name": "大学语文A",
         "course": [
             {
                 "items": [

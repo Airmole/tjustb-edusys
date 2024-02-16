@@ -93,6 +93,7 @@ class LessonCourseTable extends Base
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
      * @param string $serialNoStart 开始节数
      * @param string $serialNoEnd 结束节数
+     * @param int $timeout
      * @return array
      * @throws Exception
      */
@@ -108,7 +109,8 @@ class LessonCourseTable extends Base
         string $dayOfWeekStart = '',
         string $dayOfWeekEnd = '',
         string $serialNoStart = '',
-        string $serialNoEnd = ''
+        string $serialNoEnd = '',
+        int $timeout = 30
     ): array
     {
         $postPara = [
@@ -128,7 +130,7 @@ class LessonCourseTable extends Base
         ];
         $post = http_build_query($postPara);
         $referer = $this->edusysUrl . '/jsxsd/kbcx/kbxx_kc';
-        $html = $this->httpPost('/jsxsd/kbcx/kbxx_kc_ifr', $post, $this->cookie, $referer);
+        $html = $this->httpPost('/jsxsd/kbcx/kbxx_kc_ifr', $post, $this->cookie, $referer, $timeout);
         $vaildHtml = $this->checkCookieByHtml($html['data']);
         if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
@@ -167,7 +169,7 @@ class LessonCourseTable extends Base
                 $weekIndex++;
             }
             if ((42 * ($rowIndex + 1)) - 1 === $tdIndex) {
-                $rows[$rowIndex]['teacherName'] = $lessonName;
+                $rows[$rowIndex]['courseName'] = $lessonName;
                 $rows[$rowIndex]['course'] = $classDayCourses;
                 $lessonCourseList = [];
                 $classDayCourses = [];
