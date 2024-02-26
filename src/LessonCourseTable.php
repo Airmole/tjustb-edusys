@@ -197,7 +197,7 @@ class LessonCourseTable extends Base
         preg_match_all('/kbcontent1\">(.*?)<br>/', $html, $courseNames);
         $courseNames = $courseNames ? $courseNames[1] : [];
 
-        preg_match_all('/班<br>(.*?)\(.*?周\)<br/', $html, $teacherNames);
+        preg_match_all('/班.*?<br>(.*?)\(.*?周\)<br/', $html, $teacherNames);
         $teacherNames = $teacherNames ? $teacherNames[1] : [];
 
         preg_match_all('/<br>.*?\((.*?周)\)<br>/', $html, $weeks);
@@ -206,19 +206,28 @@ class LessonCourseTable extends Base
         preg_match_all('/周\)<br>(.*?)<\/div/', $html, $places);
         $places = $places ? $places[1] : [];
 
+        preg_match_all('/\">.*?班.*?<br>/', $html, $classnames);
+        $classnames = $classnames ? $classnames[0] : [];
+
         foreach ($courseNames as $index => $courseName) {
             $courseName = $this->stripHtmlTagAndBlankspace($courseName);
             // P备注带括号，否则容易出现 xxx学P，例如：康复护理学P
             $courseName = preg_replace('/P$/', '(P)', $courseName);
             $courseName = preg_replace('/O$/', '(O)', $courseName);
+            if (strpos($courseName, $lessonName) !== false) $courseName = $lessonName;
             $teacherName = isset($teacherNames[$index]) ? $this->stripHtmlTagAndBlankspace((string)$teacherNames[$index]) : '';
             $place = isset($places[$index]) ? (string)$places[$index] : '';
             $week = isset($weeks[$index]) ? (string)$weeks[$index] : '';
+            // 上课班级
+            $classname = isset($classnames[$index]) ? $this->stripHtmlTagAndBlankspace((string)$classnames[$index]) : '';
+            $classname = str_replace($lessonName, '', $classname);
+            $classname = str_replace('">', '', $classname);
             $item = [
                 'courseName' => $courseName,
                 'teacher'    => $teacherName,
                 'teachWeek'  => $week,
-                'place'      => $place
+                'place'      => $place,
+                'className'  => $classname
             ];
             if (!empty($startAt)) $item['startAt'] = $startAt;
             if (!empty($endAt)) $item['endAt'] = $endAt;

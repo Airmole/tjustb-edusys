@@ -6029,152 +6029,7 @@ echo json_encode($list);
 ```json
 [
     {
-        "Name": "大学语文A",
-        "course": [
-            {
-                "items": [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [
-                        {
-                            "courseName": "大学语文A视传[2201-2202]班",
-                            "teacher": "韩易彤",
-                            "teachWeek": "2-5,7-17周",
-                            "place": "8教105",
-                            "startAt": "16:50",
-                            "endAt": "18:25"
-                        }
-                    ],
-                    []
-                ],
-                "title": "星期一"
-            },
-            {
-                "items": [
-                    [
-                        {
-                            "courseName": "大学语文A作曲2201班,音表2205班",
-                            "teacher": "韩易彤",
-                            "teachWeek": "2-5,7-17周",
-                            "place": "8教107",
-                            "startAt": "08:00",
-                            "endAt": "09:35"
-                        }
-                    ],
-                    [],
-                    [],
-                    [],
-                    [
-                        {
-                            "courseName": "大学语文A音表[2201-2202]班",
-                            "teacher": "韩易彤",
-                            "teachWeek": "2-5,7-17周",
-                            "place": "8教106",
-                            "startAt": "16:50",
-                            "endAt": "18:25"
-                        }
-                    ],
-                    []
-                ],
-                "title": "星期二"
-            },
-            {
-                "items": [
-                    [
-                        {
-                            "courseName": "大学语文A视游[2201-2202]班",
-                            "teacher": "张颖",
-                            "teachWeek": "2-5,7-17周",
-                            "place": "8教407",
-                            "startAt": "08:00",
-                            "endAt": "09:35"
-                        }
-                    ],
-                    [],
-                    [
-                        {
-                            "courseName": "大学语文A视传[2203-2204]班",
-                            "teacher": "韩易彤",
-                            "teachWeek": "2-5,7-17周",
-                            "place": "8教307",
-                            "startAt": "13:10",
-                            "endAt": "14:45"
-                        }
-                    ],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期三"
-            },
-            {
-                "items": [
-                    [],
-                    [],
-                    [
-                        {
-                            "courseName": "大学语文A音表[2203-2204]班",
-                            "teacher": "韩易彤",
-                            "teachWeek": "2-5,7-17周",
-                            "place": "8教406",
-                            "startAt": "13:10",
-                            "endAt": "14:45"
-                        }
-                    ],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期四"
-            },
-            {
-                "items": [
-                    [],
-                    [],
-                    [
-                        {
-                            "courseName": "大学语文A环设[2201-2202]班",
-                            "teacher": "张颖",
-                            "teachWeek": "2-5,7-17周",
-                            "place": "8教106",
-                            "startAt": "13:10",
-                            "endAt": "14:45"
-                        }
-                    ],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期五"
-            },
-            {
-                "items": [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期六"
-            },
-            {
-                "items": [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期日"
-            }
-        ]
-    },
-    {
-        "teacherName": "大学语文B",
+        "courseName": "大学日语II",
         "course": [
             {
                 "items": [
@@ -6201,111 +6056,143 @@ echo json_encode($list);
             {
                 "items": [
                     [],
-                    [
-                        {
-                            "courseName": "大学语文B英语[2103-2104]班",
-                            "teacher": "张颖",
-                            "teachWeek": "1-5,7-17周",
-                            "place": "8教207",
-                            "startAt": "09:55",
-                            "endAt": "11:30"
-                        }
-                    ],
-                    [
-                        {
-                            "courseName": "大学语文B日语[2101-2102]班,朝鲜语2101班",
-                            "teacher": "张颖",
-                            "teachWeek": "1-5,7-17周",
-                            "place": "8教305",
-                            "startAt": "13:10",
-                            "endAt": "14:45"
-                        }
-                    ],
                     [],
                     [],
-                    []
-                ],
-                "title": "星期三"
-            },
-            {
-                "items": [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期四"
-            },
-            {
-                "items": [
                     [],
                     [
                         {
-                            "courseName": "大学语文B英语[2101-2102]班",
-                            "teacher": "张颖",
-                            "teachWeek": "1-5,7-17周",
-                            "place": "8教206",
-                            "startAt": "09:55",
-                            "endAt": "11:30"
-                        }
-                    ],
-                    [],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期五"
-            },
-            {
-                "items": [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期六"
-            },
-            {
-                "items": [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    []
-                ],
-                "title": "星期日"
-            }
-        ]
-    },
-    {
-        "teacherName": "大学语文BI",
-        "course": [
-            {
-                "items": [
-                    [],
-                    [
-                        {
-                            "courseName": "大学语文BI金融2203班",
-                            "teacher": "霍秀云",
-                            "teachWeek": "3,5,8,10,12,14,16周",
-                            "place": "8教406",
-                            "startAt": "09:55",
-                            "endAt": "11:30"
+                            "courseName": "大学日语II",
+                            "teacher": "孟彤",
+                            "teachWeek": "1-16周",
+                            "place": "9教205",
+                            "classnames": "临班1",
+                            "startAt": "16:50",
+                            "endAt": "18:25"
                         },
                         {
-                            "courseName": "大学语文BI",
-                            "teacher": "霍秀云",
-                            "teachWeek": "2,4,7,9,11,13,15,17周",
-                            "place": "8教406",
-                            "startAt": "09:55",
-                            "endAt": "11:30"
+                            "courseName": "大学日语II",
+                            "teacher": "卢是之",
+                            "teachWeek": "1-16周",
+                            "place": "9教206",
+                            "classnames": "临班5",
+                            "startAt": "16:50",
+                            "endAt": "18:25"
                         }
                     ],
+                    [
+                        {
+                            "courseName": "大学日语II",
+                            "teacher": "孟彤",
+                            "teachWeek": "1-16周",
+                            "place": "9教205",
+                            "classnames": "临班1",
+                            "startAt": "19:10",
+                            "endAt": "21:35"
+                        },
+                        {
+                            "courseName": "大学日语II",
+                            "teacher": "卢是之",
+                            "teachWeek": "1-16周",
+                            "place": "9教206",
+                            "classnames": "临班5",
+                            "startAt": "19:10",
+                            "endAt": "21:35"
+                        }
+                    ]
+                ],
+                "title": "星期三"
+            },
+            {
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ],
+                "title": "星期四"
+            },
+            {
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [
+                        {
+                            "courseName": "大学日语II",
+                            "teacher": "田军",
+                            "teachWeek": "1-16周",
+                            "place": "9教205",
+                            "classnames": "临班3",
+                            "startAt": "16:50",
+                            "endAt": "18:25"
+                        },
+                        {
+                            "courseName": "大学日语II",
+                            "teacher": "卢是之",
+                            "teachWeek": "1-16周",
+                            "place": "9教206",
+                            "classnames": "临班7",
+                            "startAt": "16:50",
+                            "endAt": "18:25"
+                        }
+                    ],
+                    [
+                        {
+                            "courseName": "大学日语II",
+                            "teacher": "田军",
+                            "teachWeek": "1-16周",
+                            "place": "9教205",
+                            "classnames": "临班3",
+                            "startAt": "19:10",
+                            "endAt": "21:35"
+                        },
+                        {
+                            "courseName": "大学日语II",
+                            "teacher": "卢是之",
+                            "teachWeek": "1-16周",
+                            "place": "9教206",
+                            "classnames": "临班7",
+                            "startAt": "19:10",
+                            "endAt": "21:35"
+                        }
+                    ]
+                ],
+                "title": "星期五"
+            },
+            {
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ],
+                "title": "星期六"
+            },
+            {
+                "items": [
+                    [],
+                    [],
+                    [],
+                    [],
+                    [],
+                    []
+                ],
+                "title": "星期日"
+            }
+        ]
+    },
+    {
+        "courseName": "大学日语IV",
+        "course": [
+            {
+                "items": [
+                    [],
+                    [],
                     [],
                     [],
                     [],
@@ -6318,16 +6205,7 @@ echo json_encode($list);
                     [],
                     [],
                     [],
-                    [
-                        {
-                            "courseName": "大学语文BI国贸[2201-2202]班",
-                            "teacher": "霍秀云",
-                            "teachWeek": "2,4,7,9,11,13,15,17周",
-                            "place": "9教104",
-                            "startAt": "15:00",
-                            "endAt": "16:35"
-                        }
-                    ],
+                    [],
                     [],
                     []
                 ],
@@ -6339,7 +6217,35 @@ echo json_encode($list);
                     [],
                     [],
                     [],
-                    [],
+                    [
+                        {
+                            "courseName": "大学日语IV",
+                            "teacher": "董玲",
+                            "teachWeek": "1-16周",
+                            "place": "8教205",
+                            "classnames": "临班9",
+                            "startAt": "16:50",
+                            "endAt": "18:25"
+                        },
+                        {
+                            "courseName": "大学日语IV",
+                            "teacher": "胡贝贝",
+                            "teachWeek": "1-16周",
+                            "place": "8教206",
+                            "classnames": "临班11",
+                            "startAt": "16:50",
+                            "endAt": "18:25"
+                        },
+                        {
+                            "courseName": "大学日语IV",
+                            "teacher": "黄静",
+                            "teachWeek": "1-16周",
+                            "place": "8教207",
+                            "classnames": "临班13",
+                            "startAt": "16:50",
+                            "endAt": "18:25"
+                        }
+                    ],
                     []
                 ],
                 "title": "星期三"
