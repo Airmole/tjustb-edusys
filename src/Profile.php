@@ -37,7 +37,11 @@ class Profile extends Base
             $html['data'] = $this->formatStudentProfile($html['data']);
             return $html;
         } else {
-            throw new Exception('暂不支持教师账号，开发中...');
+            $html = $this->httpGet('/jsxsd/jsxx/queryjsxxjb', $this->cookie, $referer);
+            $vaildHtml = $this->checkCookieByHtml($html['data']);
+            if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+            $html['data'] = $this->formatTeacherProfile($html['data']);
+            return $html;
         }
     }
 
@@ -175,6 +179,68 @@ class Profile extends Base
         if ($response['code'] !== Base::CODE_SUCCESS) return '';
         if (strpos($response['data'], 'authserver.bkty.top/authserver/login')) return '';
         return base64_encode($response['data']);
+    }
+
+    /**
+     * 格式化匹配教师基本信息
+     * @param string $html
+     * @return array
+     * @throws Exception
+     */
+    public function formatTeacherProfile(string $html): array
+    {
+        $profile = [];
+        try {
+            preg_match("/教工号：(.*)?姓名：/s", $html, $usercode);
+            $profile['usercode'] = $usercode[1] ?: '';
+
+            preg_match("/姓名：(.*)?曾用名：/s", $html, $name);
+            $profile['name'] = $name[1] ?: '';
+
+            preg_match("/性别：(.*)?出生日期/s", $html, $gender);
+            $profile['gender'] = $gender[1] ?: '';
+
+            preg_match("/出生日期：(.*)?出生地：/s", $html, $birthday);
+            $profile['birthday'] = $birthday[1] ?: '';
+
+            preg_match("/国籍：(.*)?民族：/s", $html, $country);
+            $profile['country'] = $country[1] ?: '';
+
+            preg_match("/民族：(.*)?证件类型：/s", $html, $nation);
+            $profile['nation'] = $nation[1] ?: '';
+
+            preg_match("/证件类型：(.*)?证件号码：/s", $html, $idcardType);
+            $profile['idcardType'] = $idcardType[1] ?: '';
+
+            preg_match("/证件号码：(.*)?编制类别：/s", $html, $idcard);
+            $profile['idcard'] = $idcard[1] ?: '';
+
+            preg_match("/编制类别：(.*)?教职工类别：/s", $html, $jobType);
+            $profile['jobType'] = $jobType[1] ?: '';
+
+            preg_match("/教职工类别：(.*)?当前状态：/s", $html, $teacherType);
+            $profile['teacherType'] = $teacherType[1] ?: '';
+
+            preg_match("/当前状态：(.*)?档案编号：/s", $html, $workStatus);
+            $profile['workStatus'] = $workStatus[1] ?: '';
+
+            preg_match("/健康状况：(.*)?血型：/s", $html, $health);
+            $profile['health'] = $health[1] ?: '';
+
+            preg_match("/所属单位：(.*)?港澳台侨胞：/s", $html, $college);
+            $profile['college'] = $college[1] ?: '';
+
+            preg_match("/电子信箱：(.*)?办公电话：/s", $html, $email);
+            $profile['email'] = $email[1] ?: '';
+        } catch (\Exception $e) {
+            throw new Exception('获取失败' . $e->getMessage());
+        }
+
+        foreach ($profile as $key => $value) {
+            $profile[$key] = str_replace('*', '', $this->stripHtmlTagAndBlankspace($value));
+        }
+
+        return $profile;
     }
 
 }

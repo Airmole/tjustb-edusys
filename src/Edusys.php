@@ -20,12 +20,23 @@ class Edusys
     public string $cookie;
 
     /**
+     * @var string 登录模式： new,old
+     */
+    public string $mode;
+
+    public function __construct(string $mode = 'new')
+    {
+        if (empty($this->mode)) $this->mode = $mode;
+    }
+
+    /**
      * 获取登录所需参数
      * @return array
+     * @throws Exception
      */
     public function getLoginPara(): array
     {
-        $login = new Login();
+        $login = new Login($this->mode);
         return $login->getLoginPara();
     }
 
@@ -40,7 +51,7 @@ class Edusys
      */
     public function selfLogin(string $usercode, string $password, string $captcha, string $cookie): array
     {
-        $login = new Login();
+        $login = new Login($this->mode);
         $result = $login->login($usercode, $password, $captcha, $cookie);
         if ($result['code'] === Base::CODE_SUCCESS) {
             $this->usercode = $usercode;
@@ -59,7 +70,7 @@ class Edusys
      */
     public function autoLogin(string $usercode, string $password, int $retry = 1): array
     {
-        $login = new Login();
+        $login = new Login($this->mode);
         $result = $login->autoLogin($usercode, $password, $retry);
         if ($result['code'] === Base::CODE_SUCCESS) {
             $this->usercode = $usercode;
