@@ -29,7 +29,7 @@ class Classroom extends Base
      */
     public function options(): array
     {
-        $referer = $this->edusysUrl . '/jsxsd/framework/xsMain.jsp';
+        $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp');
         $html = $this->httpGet('/jsxsd/kbxx/jsjy_query', $this->cookie, $referer);
         $vaildHtml = $this->checkCookieByHtml($html['data']);
         if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);

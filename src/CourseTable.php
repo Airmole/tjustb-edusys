@@ -29,8 +29,9 @@ class CourseTable extends Base
      */
     public function myCourseQueryOptions(): array
     {
-        $referer = $this->edusysUrl . '/jsxsd/framework/xsMain.jsp';
-        $html = $this->httpGet('/jsxsd/xskb/xskb_list.do', $this->cookie, $referer);
+        $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp');
+        $url = $this->isStudent($this->usercode) ? '/jsxsd/xskb/xskb_list.do' : '/jsxsd/jskb/jskb_list.do';
+        $html = $this->httpGet($url, $this->cookie, $referer);
         $vaildHtml = $this->checkCookieByHtml($html['data']);
         if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
@@ -86,12 +87,17 @@ class CourseTable extends Base
     public function semesterCourse(string $week = '', string $semester = ''): array
     {
         $post = "zc={$week}&xnxq01id={$semester}";
-        $referer = $this->edusysUrl . '/jsxsd/xskb/xskb_list.do';
-        $html = $this->httpPost('/jsxsd/xskb/xskb_list.do', $post, $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        if ($this->isStudent($this->usercode)) {
+            $referer = $this->edusysUrl . '/jsxsd/xskb/xskb_list.do';
+            $html = $this->httpPost('/jsxsd/xskb/xskb_list.do', $post, $this->cookie, $referer);
+        } else {
+            $referer = $this->edusysUrl . '/jsxsd/jskb/jskb_list.do';
+            $html = $this->httpPost('/jsxsd/jskb/jskb_list.do', $post, $this->cookie, $referer);
+        }
+        $validHtml = $this->checkCookieByHtml($html['data']);
+        if ($validHtml !== true) throw new Exception($validHtml['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
-        return $this->formatMyCourse($html['data']);
+        return $this->formatMyCourse($html['data'], $this->isTeacher($this->usercode));
     }
 
     /**
@@ -155,7 +161,11 @@ class CourseTable extends Base
                 $cellHtml = $cellHtml ? $cellHtml[0] : '';
                 // 非课程单元格
                 if (empty($cellHtml)) continue;
-                $coursesList[] = $this->formatCellHtmlCourse($cellHtml, $startAt, $endAt);
+                if ($this->isStudent($this->usercode)) {
+                    $coursesList[] = $this->formatStudentCellHtmlCourse($cellHtml, $startAt, $endAt);
+                } else {
+                    $coursesList[] = $this->formatTeacherCellHtmlCourse($cellHtml, $startAt, $endAt);
+                }
             }
         }
 
@@ -193,7 +203,7 @@ class CourseTable extends Base
      * @param string $endAt 下课时间
      * @return array
      */
-    public function formatCellHtmlCourse(string $html, string $startAt = '', string $endAt = ''): array
+    public function formatStudentCellHtmlCourse(string $html, string $startAt = '', string $endAt = ''): array
     {
         // 空课程单元格
         if (empty($this->stripHtmlTagAndBlankspace($html))) return [];
@@ -229,6 +239,65 @@ class CourseTable extends Base
                 'teachWeek'  => isset($weeks[$index]) ? (string)$weeks[$index] : '',
                 'teachNo'    => isset($serialNos[$index]) ? (string)$serialNos[$index] : '',
                 'place'      => isset($places[$index]) ? (string)$places[$index] : '',
+            ];
+            if (!empty($startAt)) $item['startAt'] = $startAt;
+            if (!empty($endAt)) $item['endAt'] = $endAt;
+            $courses[] = $item;
+        }
+        return $courses;
+    }
+
+    /**
+     * 解析匹配教师课表单元格内课程信息
+     * @param string $html
+     * @param string $startAt
+     * @param string $endAt
+     * @return array
+     */
+    public function formatTeacherCellHtmlCourse(string $html, string $startAt = '', string $endAt = ''): array
+    {
+        // 空课程单元格
+        if (empty($this->stripHtmlTagAndBlankspace($html))) return [];
+        // 匹配课程名
+        preg_match_all('/[r" ]>(.*?)周次?/', $html, $courseNames);
+        $courseNames = $courseNames ? $courseNames[1] : [];
+        // 匹配周
+        preg_match_all('/周次.*?>(.*?)</', $html, $weeks);
+        $weeks = $weeks ? $weeks[1] : [];
+        // 匹配教室
+        preg_match_all('/教室.*?>(.*?)\[/', $html, $places);
+        $places = $places ? $places[1] : [];
+        // 匹配节次
+        preg_match_all('/\[([\d-]*?)]节/', $html, $serialNos);
+        $serialNos = $serialNos ? $serialNos[1] : [];
+        // 匹配班级
+        preg_match_all('/节<\/font><br\/>(.*?):\d*?<br/', $html, $classNames);
+        $classNames = $classNames ? $classNames[1] : [];
+        // 匹配上课人数
+        preg_match_all('/班:(\d*?)<br/', $html, $people);
+        $people = $people ? $people[1] : [];
+        // 匹配考核方式
+        preg_match_all('/:\d*?<br\/>(.*?)<br\/>总学时/', $html, $accessMethod);
+        $accessMethod = $accessMethod ? $accessMethod[1] : [];
+        // 总学时
+        preg_match_all('/>总学时：(\d*?)</', $html, $period);
+        $period = $period ? $period[1] : [];
+
+        $courses = [];
+        foreach ($courseNames as $index => $courseName) {
+            $courseName = $this->stripHtmlTagAndBlankspace($courseName);
+            // P备注带括号，否则容易出现 xxx学P，例如：康复护理学P
+            $courseName = preg_replace('/P$/', '(P)', $courseName);
+            $courseName = preg_replace('/O$/', '(O)', $courseName);
+            $item = [
+                'courseName' => $courseName,
+                'teachWeek'  => isset($weeks[$index]) ? (string)$weeks[$index] : '',
+                'teachNo'    => isset($serialNos[$index]) ? (string)$serialNos[$index] : '',
+                'place'      => isset($places[$index]) ? (string)$places[$index] : '',
+                'className' => isset($classNames[$index]) ? (string)$classNames[$index] : '',
+                'people'     => isset($people[$index]) ? (string)$people[$index] : '',
+                'accessMethod' => isset($accessMethod[$index]) ? (string)$accessMethod[$index] : '',
+                'period'     => isset($period[$index]) ? (string)$period[$index] : '',
             ];
             if (!empty($startAt)) $item['startAt'] = $startAt;
             if (!empty($endAt)) $item['endAt'] = $endAt;
