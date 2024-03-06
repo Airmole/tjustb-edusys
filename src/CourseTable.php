@@ -334,7 +334,7 @@ class CourseTable extends Base
     {
         if (empty($date)) $date = date('Y-m-d');
         $post = "rq={$date}";
-        $referer = $this->edusysUrl . '/jsxsd/framework/xsMain_new.jsp?t1=1';
+        $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain_new.jsp?t1=1' : '/jsxsd/framework/jsMain_new.jsp?t1=1');
         $html = $this->httpPost('/jsxsd/framework/main_index_loadkb.jsp', $post, $this->cookie, $referer);
         $vaildHtml = $this->checkCookieByHtml($html['data']);
         if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
@@ -445,32 +445,44 @@ class CourseTable extends Base
         preg_match('/课程属性：(.*?)课程名称/', $html, $classType);
         $classType = $classType ? $classType[1] : '';
 
-        preg_match('/课程名称：(.*?)上课时间/', $html, $courseName);
-        $courseName = $courseName ? $courseName[1] : '';
-
         preg_match('/上课时间：(.*?)上课地点/', $html, $teachTime);
         $teachTime = $teachTime ? $teachTime[1] : '';
 
         preg_match('/上课时间：(.*?)星期/', $html, $teachWeek);
         $teachWeek = $teachWeek ? $teachWeek[1] : '';
 
-        preg_match('/上课时间.*? (.*?) .*?上课地点/', $html, $dayOfWeek);
-        $dayOfWeek = $dayOfWeek ? $dayOfWeek[1] : '';
-
-        preg_match('/上课时间.*?\[(.*?)\]节/', $html, $teachNo);
+        preg_match('/上课时间.*?\[(.*?)]节/', $html, $teachNo);
         $teachNo = $teachNo ? $teachNo[1] : '';
 
         preg_match('/上课地点：(.*?)\'.*?>/', $html, $place);
         $place = $place ? $place[1] : '';
 
+        preg_match('/上课时间.*? (.*?) .*?上课地点/', $html, $dayOfWeek);
+        $dayOfWeek = $dayOfWeek ? $dayOfWeek[1] : '';
+
         $course = [
-            'courseName' => $courseName,
             'teachTime'  => $teachTime,
             'teachWeek'  => $teachWeek,
             'teachNo'    => $teachNo,
             'place'      => $place,
             'dayOfWeek'  => $dayOfWeek
         ];
+
+        if ($this->isStudent($this->usercode)) {
+            preg_match('/课程名称：(.*?)上课时间/', $html, $courseName);
+            $courseName = $courseName ? $courseName[1] : '';
+
+            $course['courseName'] = $courseName;
+        } else {
+            preg_match('/课程名称：(.*?)上课班级/', $html, $courseName);
+            $courseName = $courseName ? $courseName[1] : '';
+
+            preg_match('/上课班级：(.*?)上课时间/', $html, $className);
+            $className = $className ? $className[1] : '';
+
+            $course['courseName'] = $courseName;
+            $course['className'] = $className;
+        }
 
         if (!empty($startAt)) $course['startAt'] = $startAt;
         if (!empty($endAt)) $course['endAt'] = $endAt;
