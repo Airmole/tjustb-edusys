@@ -19,7 +19,7 @@ class Teacher extends Base
         $this->cookie = $cookie;
         $this->usercode = $usercode;
         if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
+        if (empty($this->usercode)) throw new Exception('账号参数不得为空');
     }
 
     /**
@@ -45,7 +45,7 @@ class Teacher extends Base
      */
     public function formatCourseList(string $html): array
     {
-        preg_match_all('/list-group-item.*?<\/span>/s', $html, $courseListHtmls);
+        preg_match_all('/list-group-item.*?&nbsp;/s', $html, $courseListHtmls);
         $courseListHtmls = $courseListHtmls ? $courseListHtmls[0] : [];
 
         $courses = [];
@@ -79,6 +79,7 @@ class Teacher extends Base
         if (empty($queryCode)) throw new Exception('查询码不得为空');
         $referer = $this->edusysUrl . '/jsxsd/framework/jsMain.jsp';
         $url = "/jsxsd/framework/jsMain_hmc.jsp?jx0404id={$queryCode}";
+
         $html = $this->httpGet($url, $this->cookie, $referer);
         $validHtml = $this->checkCookieByHtml($html['data']);
         if ($validHtml !== true) throw new Exception($validHtml['data']);
@@ -93,7 +94,7 @@ class Teacher extends Base
      */
     public function formatStudentList(string $html): array
     {
-        preg_match_all('/<tr>(.*?)<\/tr>/',$html,$rows);
+        preg_match_all('/<tr>(.*?)<\/tr>/s',$html,$rows);
         $rows = $rows ? $rows[0] : [];
 
         $studentList = [];
@@ -101,14 +102,14 @@ class Teacher extends Base
             if ($index == 0) continue;
             $tempArray = explode("</td>",$row);
             $studentList[] = [
-                'no' => $tempArray[0],
-                'major' => $tempArray[1],
-                'profession' => $tempArray[2],
-                'grade' => $tempArray[3],
-                'className' => $tempArray[4],
-                'usercode' => $tempArray[5],
-                'name' => $tempArray[6],
-                'gender' => $tempArray[7],
+                'no' => $this->stripHtmlTagAndBlankspace($tempArray[0]),
+                'major' => $this->stripHtmlTagAndBlankspace($tempArray[1]),
+                'profession' => $this->stripHtmlTagAndBlankspace($tempArray[2]),
+                'grade' => $this->stripHtmlTagAndBlankspace($tempArray[3]),
+                'className' => $this->stripHtmlTagAndBlankspace($tempArray[4]),
+                'usercode' => $this->stripHtmlTagAndBlankspace($tempArray[5]),
+                'name' => $this->stripHtmlTagAndBlankspace($tempArray[6]),
+                'gender' => $this->stripHtmlTagAndBlankspace($tempArray[7]),
             ];
         }
 

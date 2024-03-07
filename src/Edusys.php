@@ -590,4 +590,28 @@ class Edusys
         );
     }
 
+    /**
+     * 教师查询授课列表
+     * @throws Exception
+     */
+    public function teacherCourseList(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $teacher = new Teacher($this->usercode, $this->cookie);
+        return $teacher->courseList();
+    }
+
+    /**
+     * 教师查询学生花名册
+     * @param string $queryCode 查询码
+     * @return array
+     * @throws Exception
+     */
+    public function teacherQueryStudentList(string $queryCode): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $teacher = new Teacher($this->usercode, $this->cookie);
+        return $teacher->queryStudentList($queryCode);
+    }
+
 }
