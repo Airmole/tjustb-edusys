@@ -15,16 +15,22 @@ class Login extends Base
     public string $captchaOcr;
 
     /**
+     * @var string 登录模式： new,old
+     */
+    public string $mode;
+
+    /**
      * 初始化
      * @throws Exception
      */
-    public function __construct()
+    public function __construct(string $mode = 'new')
     {
         try {
             parent::__construct();
+            $this->mode = $mode;
             // 验证码识别服务引入
             if (empty($this->captchaOcr)) $this->setCaptchaOcr();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
@@ -84,7 +90,8 @@ class Login extends Base
      */
     public function getCookie(): string
     {
-        $html = $this->httpGet('/', '', '', 5, true);
+        $url = $this->mode == 'old' ? '/jsxsd/' : '/';
+        $html = $this->httpGet($url, '', '', 5, true);
         if ($html['code'] == 0 || $html['code'] >= 400) return '';
         $response = $html['data'];
         preg_match('/Set-Cookie: JSESSIONID=(.*); Path=\//i', $response, $cookie);
@@ -109,8 +116,10 @@ class Login extends Base
      */
     public function getCaptcha(string $cookie): string
     {
-        $referer = $this->edusysUrl . '/';
-        $response = $this->httpGet('/verifycode.servlet', $cookie, $referer);
+        $url = $this->mode == 'old' ? '/jsxsd/verifycode.servlet' : '/verifycode.servlet';
+        $referer = $this->edusysUrl . ($this->mode == 'old' ? '/jsxsd/' : '/');
+        $response = $this->httpGet($url, $cookie, $referer);
+
         if ($response['code'] == 0 || $response['code'] >= 400) throw new Exception('获取验证码失败');
         return base64_encode($response['data']);
     }
@@ -138,26 +147,53 @@ class Login extends Base
      */
     public function login(string $usercode, string $password, string $captcha, string $cookie): array
     {
-        $logonSess = $this->httpPost($this->edusysUrl . '/Logon.do?method=logon&flag=sess', '', $cookie);
-        if ($logonSess['code'] != 200) throw new Exception('获取登录秘钥失败');
-        $encoded = $this->signLoginFormValue($logonSess['data'], $usercode, $password);
-        $captcha = trim($captcha);
-        $post = "userAccount=&userPassword=&RANDOMCODE={$captcha}&encoded={$encoded}";
+        if ($this->mode == 'new') {
+            $logonSess = $this->httpPost($this->edusysUrl . '/Logon.do?method=logon&flag=sess', '', $cookie);
+            if ($logonSess['code'] != 200) throw new Exception('获取登录秘钥失败');
+            $encoded = $this->signLoginFormValue($logonSess['data'], $usercode, $password);
+            $captcha = trim($captcha);
+            $post = "userAccount=&userPassword=&RANDOMCODE={$captcha}&encoded={$encoded}";
 
-        $response = $this->httpLoginPost($this->edusysUrl, $cookie, $post);
+            $response = $this->httpLoginPost($this->edusysUrl, $cookie, $post);
+            $validateResult = $this->validateLoginResult($response);
+            if ($validateResult !== true) return $validateResult;
+
+            if ($response['code'] != 302) throw new Exception('login系统异常,请联系开发者');
+            $redirectResponse = $this->httpGetFollowLocation($this->edusysUrl, $this->loginedLocationUrl($response['data']), $cookie);
+            $url = $this->isStudent($usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp';
+            $mainBoard = $this->httpGet($url, $redirectResponse['cookie'], $this->edusysUrl. '/');
+        } else {
+            $postString = "userAccount={$usercode}&userPassword=&RANDOMCODE={$captcha}&encoded=";
+            $postString = $postString . base64_encode($usercode) . "%25%25%25" . base64_encode($password);
+            $referer = $this->edusysUrl . '/jsxsd/';
+            $response = $this->httpPost('/jsxsd/xk/LoginToXk', $postString, $cookie, $referer);
+            $validateResult = $this->validateLoginResult($response);
+            if ($validateResult !== true) return $validateResult;
+            if ($response['code'] != 302) throw new Exception('login系统异常,请联系开发者');
+            $url = $this->isStudent($usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp';
+            $mainBoard = $this->httpGet($url, $cookie, $this->edusysUrl. '/jsxsd/');
+        }
+
+        if ($mainBoard['code'] != 200) throw new Exception('访问主界面异常失败');
+        $cookie = $this->mode == 'old' ? $cookie : $redirectResponse['cookie'];
+        $this->cookie = $this->mode == 'old' ? $cookie : $redirectResponse['cookie'];
+        $this->usercode = $usercode;
+        return ['code' => 200, 'data' => $cookie];
+    }
+
+    /**
+     * 根据返回结果验证是否登录成功
+     * @param array $response
+     * @return array|true
+     */
+    public function validateLoginResult(array $response)
+    {
         if (strpos($response['data'], '验证码错误')) return ['code' => 403, 'data' => '验证码错误'];
         if (strpos($response['data'], '验证码不能为空')) return ['code' => 403, 'data' => '验证码不能为空'];
         if (strpos($response['data'], '用户名或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '该帐号不存在或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '该帐号已锁定')) return ['code' => 403, 'data' => '错误次数过多账号锁定，请半小时后再试'];
-        if ($response['code'] != 302) throw new Exception('login系统异常,请联系开发者');
-        $redirectResponse = $this->httpGetFollowLocation($this->edusysUrl, $this->loginedLocationUrl($response['data']), $cookie);
-        $mainBoard = $this->httpGet('/jsxsd/framework/xsMain.jsp', $redirectResponse['cookie'], $this->edusysUrl. '/');
-        if ($mainBoard['code'] != 200) throw new Exception('访问主界面异常失败');
-        $cookie = $redirectResponse['cookie'];
-        $this->cookie = $redirectResponse['cookie'];
-        $this->usercode = $usercode;
-        return ['code' => 200, 'data' => $cookie];
+        return  true;
     }
 
     /**

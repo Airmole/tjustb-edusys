@@ -20,12 +20,23 @@ class Edusys
     public string $cookie;
 
     /**
+     * @var string 登录模式： new,old
+     */
+    public string $mode;
+
+    public function __construct(string $mode = 'new')
+    {
+        if (empty($this->mode)) $this->mode = $mode;
+    }
+
+    /**
      * 获取登录所需参数
      * @return array
+     * @throws Exception
      */
     public function getLoginPara(): array
     {
-        $login = new Login();
+        $login = new Login($this->mode);
         return $login->getLoginPara();
     }
 
@@ -40,7 +51,7 @@ class Edusys
      */
     public function selfLogin(string $usercode, string $password, string $captcha, string $cookie): array
     {
-        $login = new Login();
+        $login = new Login($this->mode);
         $result = $login->login($usercode, $password, $captcha, $cookie);
         if ($result['code'] === Base::CODE_SUCCESS) {
             $this->usercode = $usercode;
@@ -59,7 +70,7 @@ class Edusys
      */
     public function autoLogin(string $usercode, string $password, int $retry = 1): array
     {
-        $login = new Login();
+        $login = new Login($this->mode);
         $result = $login->autoLogin($usercode, $password, $retry);
         if ($result['code'] === Base::CODE_SUCCESS) {
             $this->usercode = $usercode;
@@ -577,6 +588,30 @@ class Edusys
             $serialNoEnd,
             $classroomStatus
         );
+    }
+
+    /**
+     * 教师查询授课列表
+     * @throws Exception
+     */
+    public function teacherCourseList(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $teacher = new Teacher($this->usercode, $this->cookie);
+        return $teacher->courseList();
+    }
+
+    /**
+     * 教师查询学生花名册
+     * @param string $queryCode 查询码
+     * @return array
+     * @throws Exception
+     */
+    public function teacherQueryStudentList(string $queryCode): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $teacher = new Teacher($this->usercode, $this->cookie);
+        return $teacher->queryStudentList($queryCode);
     }
 
 }
