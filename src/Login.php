@@ -15,7 +15,7 @@ class Login extends Base
     public string $captchaOcr;
 
     /**
-     * @var string 登录模式： new,old
+     * @var string 登录模式： new,old,sso
      */
     public string $mode;
 
@@ -57,11 +57,17 @@ class Login extends Base
      */
     public function autoLogin(string $usercode, string $password, int $retry = 1): array
     {
-        if (empty($this->captchaOcr)) throw new Exception('未配置验证码识别服务，请使用login方法手动输入验证码登录');
+        if ($this->mode !== 'sso' && empty($this->captchaOcr)) throw new Exception('未配置验证码识别服务，请使用login方法手动输入验证码登录');
         for ($i = 0; $i < $retry; $i++) {
-            $loginPara = $this->getLoginPara();
-            $captcha = $this->captchaOcr($loginPara['captcha']);
-            $response = $this->login($usercode, $password, $captcha, $loginPara['cookie']);
+            if ($this->mode === 'sso') {
+                $ssoAuth = new SsoLogin();
+                $loginPara = $ssoAuth->getLoginPara();
+                $response = $ssoAuth->login($usercode, $password, $loginPara['cookie'], $loginPara['salt'], $loginPara['execution']);
+            } else {
+                $loginPara = $this->getLoginPara();
+                $captcha = $this->captchaOcr($loginPara['captcha']);
+                $response = $this->login($usercode, $password, $captcha, $loginPara['cookie']);
+            }
             if ($response['code'] === 200) return $response;
             if ($response['code'] == 403 && strpos($response['data'], '验证码') !== false) {
                 continue;
@@ -78,6 +84,10 @@ class Login extends Base
      */
     public function getLoginPara(): array
     {
+        if ($this->mode === 'sso') {
+            $ssoAuth = new SsoLogin();
+            return $ssoAuth->getLoginPara();
+        }
         $cookie = $this->getCookie();
         $captcha = $this->getCaptcha($cookie);
         return ['cookie' => $cookie, 'captcha' => $captcha];
@@ -142,10 +152,12 @@ class Login extends Base
      * @param string $password 密码
      * @param string $captcha 验证码
      * @param string $cookie cookie
+     * @param string $salt SSO登录密码salt, SSO模式必填参数
+     * @param string $execution SSO模式必填参数
      * @return array
      * @throws Exception
      */
-    public function login(string $usercode, string $password, string $captcha, string $cookie): array
+    public function login(string $usercode, string $password, string $captcha, string $cookie, string $salt = '', string $execution = ''): array
     {
         if ($this->mode == 'new') {
             $logonSess = $this->httpPost($this->edusysUrl . '/Logon.do?method=logon&flag=sess', '', $cookie);
@@ -162,6 +174,12 @@ class Login extends Base
             $redirectResponse = $this->httpGetFollowLocation($this->edusysUrl, $this->loginedLocationUrl($response['data']), $cookie);
             $url = $this->isStudent($usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp';
             $mainBoard = $this->httpGet($url, $redirectResponse['cookie'], $this->edusysUrl. '/');
+            $cookie = $redirectResponse['cookie'];
+        } elseif ($this->mode == 'sso') {
+            $ssoAuth = new SsoLogin();
+            $mainBoard = $ssoAuth->login($usercode, $password, $cookie, $salt, $execution);
+            if ($mainBoard['code'] !== 200) return $mainBoard;
+            $cookie = $mainBoard['data'];
         } else {
             $postString = "userAccount={$usercode}&userPassword=&RANDOMCODE={$captcha}&encoded=";
             $postString = $postString . base64_encode($usercode) . "%25%25%25" . base64_encode($password);
@@ -175,8 +193,7 @@ class Login extends Base
         }
 
         if ($mainBoard['code'] != 200) throw new Exception('访问主界面异常失败');
-        $cookie = $this->mode == 'old' ? $cookie : $redirectResponse['cookie'];
-        $this->cookie = $this->mode == 'old' ? $cookie : $redirectResponse['cookie'];
+        $this->cookie = $cookie;
         $this->usercode = $usercode;
         return ['code' => 200, 'data' => $cookie];
     }

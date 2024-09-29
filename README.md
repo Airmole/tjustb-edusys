@@ -1,6 +1,6 @@
 # tjustb-edusys
 
-北京科技大学天津学院教务系统客户端（http://61.181.145.1:89/）
+北京科技大学天津学院教务系统客户端（http://jw.bkty.top:89）
 
 # Requirement
 
@@ -19,7 +19,7 @@ use Airmole\TjustbEdusys\Edusys;
 
 $usercode = '123456789'; // 系统账号
 $password = '*********'; // 系统密码
-$edusys = new Edusys();
+$edusys = new Edusys('sso'); // old,new,sso三种登录模式
 // 自动登录
 $edusys->autoLogin($usercode, $password); // 自动识别验证码登录，需要在项目根目录下.env文件配置EDUSYS_OCR_URL
 // 手动登录

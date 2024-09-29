@@ -5,9 +5,8 @@
     "require": {
         "php": ">=7.4",
         "ext-curl": "*",
-        "ext-json": "*"
-    },
-    "require-dev": {
+        "ext-json": "*",
+        "ext-openssl": "*"
     },
     "license": "GPL-3.0-or-later",
     "authors": [

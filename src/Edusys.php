@@ -20,7 +20,7 @@ class Edusys
     public string $cookie;
 
     /**
-     * @var string 登录模式： new,old
+     * @var string 登录模式： new,old,sso
      */
     public string $mode;
 
@@ -36,7 +36,7 @@ class Edusys
      */
     public function getLoginPara(): array
     {
-        $login = new Login($this->mode);
+        $login = $this->mode === 'sso' ? new SsoLogin() : new Login($this->mode);
         return $login->getLoginPara();
     }
 
@@ -46,17 +46,20 @@ class Edusys
      * @param string $password
      * @param string $captcha
      * @param string $cookie
+     * @param string $salt sso模式必填
+     * @param string $execution sso模式必填
      * @return array
      * @throws Exception
      */
-    public function selfLogin(string $usercode, string $password, string $captcha, string $cookie): array
+    public function selfLogin(string $usercode, string $password, string $captcha, string $cookie, string $salt = '', string $execution = ''): array
     {
         $login = new Login($this->mode);
-        $result = $login->login($usercode, $password, $captcha, $cookie);
+        $result = $login->login($usercode, $password, $captcha, $cookie, $salt, $execution);
         if ($result['code'] === Base::CODE_SUCCESS) {
             $this->usercode = $usercode;
             $this->cookie = $result['data'];
         }
+
         return $result;
     }
 
