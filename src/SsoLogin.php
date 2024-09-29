@@ -77,9 +77,10 @@ class SsoLogin extends Base
         ];
         $postString = http_build_query($postData);
         $result = $this->httpPostLogin($url, $postString, $cookie);
-        if ($result['code'] !== 200) throw new Exception('登录失败' . json_encode($result));
-        $validateResult = $this->validateLoginResult($result);
-        if ($validateResult !== true) return $validateResult;
+        if ($result['code'] !== 200) {
+            $validateResult = $this->validateLoginResult($result);
+            if ($validateResult !== true) return $validateResult;
+        }
         preg_match_all('/Set-Cookie: JSESSIONID=(.*?); Path=\/jsxsd/', $result['data'], $newCookie);
         if (!isset($newCookie[1]) || !isset($newCookie[1][0])) throw new Exception('登录获取cookie失败' . json_encode($newCookie));
         $newCookieValue = $newCookie[1][0];
@@ -96,6 +97,7 @@ class SsoLogin extends Base
      */
     public function validateLoginResult(array $response)
     {
+        if (strpos($response['data'], '该账号非常用账号或用户名密码有误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '您提供的用户名或者密码有误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '登录凭证不可用')) return ['code' => 403, 'data' => '登录凭证不可用'];
         return  true;
