@@ -284,18 +284,22 @@ class Classroom extends Base
 
     /**
      * 教学地点列表（教学区、教学楼、教室）
-     * @param string $type 类型：area-教学区，building-教学楼，classroom-教室
+     * @param string $type 类型：area-教学区，building-教学楼，classroom-教室, type-教室类型
+     * @param string $buildingId 教学楼ID
      * @return array
      * @throws Exception
      */
-    public function classroomList(string $type = 'classroom'): array
+    public function classroomList(string $type = 'classroom', string $buildingId = ''): array
     {
         $requestType = 'newjs';
         if ($type === 'area') $requestType = 'jxq';         // 教学区列表
         if ($type === 'building') $requestType = 'jxl';     // 教学楼列表
         if ($type === 'classroom') $requestType = 'newjs';  // 教室列表
+        if ($type === 'type') $requestType = 'js';          // 教室类型?
 
-        $queryData = [ 'xqid' => '', 'requestType' => $requestType ];
+
+        $queryData = [ 'xqid' => '', 'gnqid' => '', 'requestType' => $requestType ];
+        if (!empty($buildingId)) $queryData['jxlid'] = $buildingId;
         $uri = '/jsxsd/kbxx/jsjy_processAjax?' . http_build_query($queryData);
         $referer = $this->edusysUrl . '/jsxsd/kbxx/jsjy_query';
         $json =  $this->httpGet($uri, $this->cookie, $referer);

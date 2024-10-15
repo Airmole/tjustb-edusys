@@ -6896,8 +6896,10 @@ echo json_encode($list);
 所需参数：
 
 | para | type   | nullable | default   | tips                                  |
-| ---- | ------ |:--------:| --------- | ------------------------------------- |
+| ---- | ------ |:--------:| --------- |---------------------------------------|
 | type | string | ✅        | classroom | 类型：area-教学区，building-教学楼，classroom-教室 |
+| buildingId | string | ✅        |  | 教学楼ID                                 |
+
 
 调用示例：
 
@@ -6909,6 +6911,7 @@ $password = '*********'; // 系统密码
 $edusys = new Edusys();
 $edusys->autoLogin($usercode, $password);
 $list = $edusys->classroomList('building');
+// $list = $edusys->classroomList('classroom'， ’0109‘);
 echo json_encode($list);
 ```
 
