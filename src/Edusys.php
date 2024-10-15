@@ -527,14 +527,15 @@ class Edusys
     /**
      * 教学地点列表（教学区、教学楼、教室）
      * @param string $type 类型：area-教学区，building-教学楼，classroom-教室
+     * @param string $buildingId 教学楼ID
      * @return array
      * @throws Exception
      */
-    public function classroomList(string $type = 'classroom'): array
+    public function classroomList(string $type = 'classroom', string $buildingId = ''): array
     {
         if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
         $classroom = new Classroom($this->usercode, $this->cookie);
-        return $classroom->classroomList($type);
+        return $classroom->classroomList($type, $buildingId);
     }
 
     /**
