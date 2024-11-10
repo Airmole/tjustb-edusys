@@ -66,11 +66,13 @@ class CourseTable extends Base
         $semesterlistHtml = $semesterlistHtml ? $semesterlistHtml[0] : '';
         preg_match_all('/>(.*)?<\/option>/', $semesterlistHtml, $semesterNames);
         preg_match_all('/<option value="(.*)?" /', $semesterlistHtml, $semesterValues);
+        preg_match_all('/value=(.*?)>/', $semesterlistHtml, $checkeds);
         $semesterNames = $semesterNames[1] ?: [];
         $semesterValues = $semesterValues[1] ?: [];
+        $checkeds = isset($checkeds) && $checkeds ? $checkeds[1] : [];
         if (count($semesterNames) !== count($semesterValues)) throw new Exception('匹配学年学期选项列表异常');
         foreach ($semesterNames as $index => $semesterName) {
-            $checked = $index === 0;
+            $checked = strpos($checkeds[$index], 'selected') !== false;
             $semesterOptions[] = ['name' => $semesterName, 'value' => $semesterValues[$index], 'checked' => $checked];
         }
 
