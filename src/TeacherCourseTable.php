@@ -48,7 +48,7 @@ class TeacherCourseTable extends Base
         // 学年学期选项列表
         preg_match('/学年学期.*?时间模式/s', $html, $semesterlistHtml);
         $semesterlistHtml = $semesterlistHtml ? $semesterlistHtml[0] : '';
-        $semesterOptions = $this->formatOption($semesterlistHtml);
+        $semesterOptions = $this->formatOption($semesterlistHtml, '', '', '/value=(.*?)>/');
         // 时间模式
         preg_match('/时间模式.*?上课院系/s', $html, $timeModelHtml);
         $timeModelHtml = $timeModelHtml ? $timeModelHtml[0] : '';

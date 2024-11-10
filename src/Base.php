@@ -311,21 +311,29 @@ class Base
      * @param string $html
      * @param string $namePattern
      * @param string $valuePattern
+     * @param string $checkedPattern
      * @return array
      * @throws Exception
      */
-    public function formatOption(string $html, string $namePattern = '', string $valuePattern = ''): array
+    public function formatOption(string $html, string $namePattern = '', string $valuePattern = '', string $checkedPattern = '0'): array
     {
         $result = [];
         $namePattern = $namePattern === '' ? '/>(.*)?<\/option>/' : $namePattern;
         $valuePattern = $valuePattern === '' ? '/<option value="(.*)?" /' : $valuePattern;
+        $checkedPattern = $checkedPattern === '' ? '/value=(.*?)>/' : $checkedPattern;
         preg_match_all($namePattern, $html, $names);
         preg_match_all($valuePattern, $html, $values);
+        if ($checkedPattern !== '0') preg_match_all($checkedPattern, $html, $checkeds);
         $names = $names ? $names[1] : [];
         $values = $values ? $values[1] : [];
+        $checkeds = isset($checkeds) && $checkeds ? $checkeds[1] : [];
         if (count($names) !== count($values)) throw new Exception('匹配模式选项列表异常');
         foreach ($names as $index => $name) {
-            $checked = $index === 0;
+            if ($checkedPattern === '0') {
+                $checked = $index === 0;
+            } else {
+                $checked = strpos($checkeds[$index], 'selected') !== false;
+            }
             $result[] = ['name' => $name, 'value' => $values[$index], 'checked' => $checked];
         }
         return $result;
