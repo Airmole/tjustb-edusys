@@ -29,6 +29,7 @@
 - [获取教室借用详情信息](#获取教室借用详情信息)
 - [教师授课列表获取](#教师授课列表获取)
 - [教师查询学生花名册](#教师查询学生花名册)
+- [学生获取培养方案](#学生获取培养方案)
 
 ---
 
@@ -7962,7 +7963,7 @@ echo json_encode($list);
 
 > 仅教师账号可用，传入教师授课列表接口返回的queryCode，获取课堂学生花名册
 
-方法：`classroomList()`
+方法：`teacherQueryStudentList()`
 
 所需参数：
 
@@ -8009,6 +8010,134 @@ echo json_encode($list);
         "gender": "女"
     }
 ]
+```
+
+</details>
+
+### 学生获取培养方案
+
+> 仅学生账号可用
+
+方法：`trainingPlan()`
+
+
+<details>
+  <summary>返回参数示例</summary>
+
+```json
+{
+  "title": "2015版本计算机科学与技术培养方案培养方案及教学计划",
+  "cultivateTarget": "2015版本计算机科学与技术培养目标",
+  "decription": "2015版本计算机科学与技术培养方案",
+  "courseList": {
+    "content": [
+      {
+        "courseSystem": {
+          "title": "专业选修课",
+          "due": "0",
+          "existing": "27"
+        },
+        "summary": {
+          "credit": "85",
+          "lectureHours": "710",
+          "experimentalHours": "296",
+          "designHours": "0",
+          "computerHours": "124",
+          "otherHours": "0",
+          "practicalHours": "230",
+          "totalHours": "1360"
+        },
+        "items": [
+          {
+            "group": "",
+            "courseCode": "X053001",
+            "courseName": "实用软件工程",
+            "completion": null,
+            "courseNature": "专业选修课",
+            "courseType": "限选",
+            "credit": "2",
+            "lectureHours": "32",
+            "experimentalHours": "0",
+            "designHours": "0",
+            "computerHours": "0",
+            "otherHours": "0",
+            "practicalHours": "0",
+            "totalHours": "32",
+            "term": "6"
+          },
+          {
+            "group": "",
+            "courseCode": "X053004",
+            "courseName": "软件测试",
+            "completion": {
+              "status": "已修",
+              "score": "86"
+            },
+            "courseNature": "专业选修课",
+            "courseType": "限选",
+            "credit": "2",
+            "lectureHours": "24",
+            "experimentalHours": "0",
+            "designHours": "0",
+            "computerHours": "8",
+            "otherHours": "0",
+            "practicalHours": "0",
+            "totalHours": "32",
+            "term": "6"
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "termProgress": [
+        {
+          "term": "",
+          "progress": "80.39"
+        },
+        {
+          "term": "1",
+          "progress": "100"
+        },
+        {
+          "term": "2",
+          "progress": "90.91"
+        },
+        {
+          "term": "3",
+          "progress": "92.31"
+        },
+        {
+          "term": "4",
+          "progress": "73.33"
+        },
+        {
+          "term": "5",
+          "progress": "76.92"
+        },
+        {
+          "term": "6",
+          "progress": "29.63"
+        },
+        {
+          "term": "7",
+          "progress": "100"
+        },
+        {
+          "term": "8",
+          "progress": "80"
+        }
+      ],
+      "credit": 262,
+      "lectureHours": 2458,
+      "experimentalHours": 512,
+      "designHours": 0,
+      "computerHours": 408,
+      "otherHours": 0,
+      "practicalHours": 742,
+      "totalHours": 4120
+    }
+  }
+}
 ```
 
 </details>
