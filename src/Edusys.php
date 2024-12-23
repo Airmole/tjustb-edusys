@@ -618,4 +618,16 @@ class Edusys
         return $teacher->queryStudentList($queryCode);
     }
 
+    /**
+     * 获取培养方案
+     * @return array
+     * @throws Exception
+     */
+    public function trainingPlan(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $plan = new TrainingPlan($this->usercode, $this->cookie);
+        return $plan->trainingPlan();
+    }
+
 }
