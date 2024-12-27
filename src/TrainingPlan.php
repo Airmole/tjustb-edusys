@@ -91,7 +91,7 @@ class TrainingPlan extends Base
         if (!isset($courseSystems[0])) throw new Exception('获取培养方案表异常');
         // 课程体系遍历
         foreach ($courseSystems[0] as $index => $courseSystem) {
-            if (str_contains($courseSystem, 'logic:iterate')) continue; // 教务系统HTML注释掉的无效数据
+            if (strpos($courseSystem, 'logic:iterate') !== false) continue; // 教务系统HTML注释掉的无效数据
             preg_match('/>(.*?)<br>\(应修/', $courseSystem, $courseSystemTitle);
             preg_match('/应修(.*?)\//', $courseSystem, $due);
             preg_match('/已修(.*?)\)<\//', $courseSystem, $existing);
@@ -99,8 +99,8 @@ class TrainingPlan extends Base
             $due = $due[1] ? $this->stripBlankspace($due[1]) : '';
             $existing = $existing[1] ? $this->stripBlankspace($existing[1]) : '';
             $content[$index]['courseSystem'] = [
-                'title'    => $courseSystemTitle, // 课程体系名称
-                'due'      => $due,               // 课程体系应修
+                'title' => $courseSystemTitle, // 课程体系名称
+                'due' => $due,               // 课程体系应修
                 'existing' => $existing           // 课程体系已修
             ];
 
@@ -124,7 +124,9 @@ class TrainingPlan extends Base
             foreach ($courseHtmls[0] as $courseHtml) {
                 preg_match_all('/<TD.*?>(.*?)<\/TD>/', $courseHtml, $tds);
                 $tds = $tds[1] ?? [];
-                $tds = array_filter($tds, function ($item) { return !(str_contains($item, '应修')); }); // 移除跨列的“课程体系”单元格
+                $tds = array_filter($tds, function ($item) { // 移除跨列的“课程体系”单元格
+                    return !(strpos($item, '应修') !== false);
+                });
                 $tds = array_values($tds); // 键名重新从0开始排序
                 $group = $this->stripBlankspace($tds[0]); // 选课组
                 $courseCode = $this->stripBlankspace($tds[1]); // 课程编号
@@ -138,17 +140,17 @@ class TrainingPlan extends Base
                         'score' => $score[1] ?? ''
                     ];
                 }
-                $courseNature = $this->stripBlankspace($tds[4]); // 课程性质
-                $courseType = $this->stripBlankspace($tds[5]); // 课程属性
-                $credit = $this->stripBlankspace($tds[6]); // 学分
-                $lectureHours = $this->stripBlankspace($tds[7]); // 讲课学时
-                $experimentalHours = $this->stripBlankspace($tds[8]); // 实验学时
-                $designHours = $this->stripBlankspace($tds[9]); // 设计学时
-                $computerHours = $this->stripBlankspace($tds[10]); // 上机学时
-                $otherHours = $this->stripBlankspace($tds[11]); // 其他学时
-                $practicalHours = $this->stripBlankspace($tds[12]); // 实践学时
+                $courseNature = $this->stripBlankspace($tds[4]);          // 课程性质
+                $courseType = $this->stripBlankspace($tds[5]);            // 课程属性
+                $credit = $this->stripBlankspace($tds[6]);                // 学分
+                $lectureHours = $this->stripBlankspace($tds[7]);          // 讲课学时
+                $experimentalHours = $this->stripBlankspace($tds[8]);     // 实验学时
+                $designHours = $this->stripBlankspace($tds[9]);           // 设计学时
+                $computerHours = $this->stripBlankspace($tds[10]);        // 上机学时
+                $otherHours = $this->stripBlankspace($tds[11]);           // 其他学时
+                $practicalHours = $this->stripBlankspace($tds[12]);       // 实践学时
                 $totalHours = $this->stripHtmlTagAndBlankspace($tds[13]); // 总学时
-                $term = $this->stripBlankspace($tds[14]); // 开设学期
+                $term = $this->stripBlankspace($tds[14]);                 // 开设学期
                 $content[$index]['items'][] = [
                     'group' => $group,
                     'courseCode' => $courseCode,
