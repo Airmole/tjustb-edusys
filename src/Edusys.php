@@ -630,4 +630,39 @@ class Edusys
         return $plan->trainingPlan();
     }
 
+    /**
+     * 获取需评教学期批次
+     * @return array
+     * @throws Exception
+     */
+    public function needEvaluateSemester(): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $evaluate = new EvaluateTeacher($this->usercode, $this->cookie);
+        return $evaluate->needEvaluateSemester();
+    }
+
+    /**
+     * 获取评教课程列表
+     * @param string $semesterUrl 评教学期批次页面URL
+     * @throws Exception
+     */
+    public function needEvaluateCourse(string $semesterUrl): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $evaluate = new EvaluateTeacher($this->usercode, $this->cookie);
+        return $evaluate->needEvaluateCourse($semesterUrl);
+    }
+
+    /**
+     * 获取评教课程详情
+     * @throws Exception
+     */
+    public function evaluateCourseDetail(string $courseUrl): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $evaluate = new EvaluateTeacher($this->usercode, $this->cookie);
+        return $evaluate->evaluateCourseDetail($courseUrl);
+    }
+
 }
