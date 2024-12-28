@@ -170,6 +170,7 @@ class EvaluateTeacher extends Base
 
     /**
      * 获取评教课程详情
+     * @param string $courseUrl
      * @throws Exception
      */
     public function evaluateCourseDetail(string $courseUrl): array
