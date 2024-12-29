@@ -32,8 +32,8 @@ class TrainingPlan extends Base
         if ($this->isTeacher($this->usercode)) throw new Exception('教师不适用培养计划');
         $referer = $this->edusysUrl . '/jsxsd/framework/xsMain.jsp';
         $html = $this->httpGet('/jsxsd/pyfa/topyfamx', $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $validHtml = $this->checkCookieByHtml($html['data']);
+        if ($validHtml !== true) throw new Exception($validHtml['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取培养计划失败');
         return $this->formatTrainingPlan($html['data']);
     }
@@ -48,7 +48,7 @@ class TrainingPlan extends Base
     {
         $title = '';           // 标题
         $cultivateTarget = ''; // 培养目标
-        $decription = '';      // 详细说明
+        $description = '';      // 详细说明
 
         preg_match('/<caption.*?>(.*?)<\/caption>/', $html, $title);
         $title = $title[1] ?? '';
@@ -56,8 +56,8 @@ class TrainingPlan extends Base
         preg_match('/培养目标.*?left">(.*?)<\//s', $html, $cultivateTarget);
         $cultivateTarget = $cultivateTarget[1] ?? '';
 
-        preg_match('/详细说明.*?left">(.*?)<\//s', $html, $decription);
-        $decription = $decription[1] ?? '';
+        preg_match('/详细说明.*?left">(.*?)<\//s', $html, $description);
+        $description = $description[1] ?? '';
 
         // 学期进度
         preg_match('/<select id="xnxq".*?<\/select>/s', $html, $termProgressHtml);
@@ -195,11 +195,125 @@ class TrainingPlan extends Base
         return [
             'title' => $title,
             'cultivateTarget' => $cultivateTarget, // 培养目标
-            'decription' => $decription,           // 详细说明
+            'description' => $description,           // 详细说明
             'courseList' => [
                 'content' => $content,
                 'summary' => $summary
             ]
         ];
     }
+
+    /**
+     * 教师查询培养方案筛选项
+     * @param string $college 院系
+     * @param string $grade 年级
+     * @param string $profession 专业
+     * @return array
+     * @throws Exception
+     */
+    public function options(string $college = '', string $grade = '', string $profession = ''): array
+    {
+        if ($this->isStudent($this->usercode)) throw new Exception('仅适用于教师账号');
+        $postString = "xsyx={$college}&xsnj={$grade}&xszy={$profession}";
+        $html = $this->httpPost('/jsxsd/jspyfa/pyfa_find', $postString, $this->cookie);
+        $validHtml = $this->checkCookieByHtml($html['data']);
+        if ($validHtml !== true) throw new Exception($validHtml['data']);
+        if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('教师查询培养方案筛选项失败');
+        return $this->formatTrainingPlanOptions($html['data']);
+    }
+
+    /**
+     * 正则解析匹配培养方案筛选项
+     * @param string $html
+     * @return array
+     * @throws Exception
+     */
+    public function formatTrainingPlanOptions(string $html): array
+    {
+        preg_match('/院系名称.*?所在年级/s', $html, $collegeHtml);
+        $collegeHtml = $collegeHtml[0] ?? '';
+        $college = $this->formatOption($collegeHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/',  '/<option(.*?)<\/option>/');
+
+        preg_match('/所在年级.*?专业名称/s', $html, $gradeHtml);
+        $gradeHtml = $gradeHtml[0] ?? '';
+        $grade = $this->formatOption($gradeHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/',  '/<option(.*?)<\/option>/');
+
+        preg_match('/专业名称.*?查询/s', $html, $professionHtml);
+        $professionHtml = $professionHtml[0] ?? '';
+        $profession = $this->formatOption($professionHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/',  '/<option(.*?)<\/option>/');
+
+        return [
+            'college' => $college,
+            'grade' => $grade,
+            'profession' => $profession
+        ];
+    }
+
+    /**
+     * 专业培养方案
+     * @param string $grade 年级
+     * @param string $profession 专业
+     * @param int $page 页码
+     * @return array
+     * @throws Exception
+     */
+    public function professionTrainingPlan(string $grade, string $profession, int $page = 1): array
+    {
+        if ($this->isStudent($this->usercode)) throw new Exception('仅适用于教师账号');
+        if (empty($grade) || empty($profession)) throw new Exception('年级或专业不能为空');
+        $postString = "xsnj={$grade}&xszy={$profession}&pageIndex={$page}";
+        $html = $this->httpPost('/jsxsd/jspyfa/zypyfa_query', $postString, $this->cookie);
+        $validHtml = $this->checkCookieByHtml($html['data']);
+        if ($validHtml !== true) throw new Exception($validHtml['data']);
+        if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('教师查询培养方案筛失败');
+        return $this->formatProfessionTrainingPlan($html['data']);
+    }
+
+    /**
+     * 正则解析匹配专业培养方案
+     * @param string $html
+     * @return array
+     */
+    public function formatProfessionTrainingPlan(string $html): array
+    {
+        preg_match('/value=\"(.*?)\" id=\"pageIndex\"/', $html, $currentPage);
+        $currentPage = $currentPage[1] ? intval($currentPage[1]) : 1;
+
+        preg_match('/<span> 共(\d+)页&nbsp;\d+条<\/span>/', $html, $totalPage);
+        $totalPage = $totalPage[1] ? intval($totalPage[1]) : 0;
+
+        preg_match('/<span> 共\d+页&nbsp;(\d+)条<\/span>/', $html, $total);
+        $total = $total[1] ? intval($total[1]) : 0;
+
+        preg_match_all('/<tr>\s+<td>.*?<\/td>\s+<\/tr>/s', $html, $trs);
+        $trs = $trs[0] ?? [];
+
+        $courses = [];
+        foreach ($trs as $tr) {
+            preg_match_all('/<td.*?>(.*?)<\/td>/', $tr, $tds);
+            $tds = $tds[1] ?? '';
+            $courses[] = [
+                'no' => strlen($tds[0]) ? $this->stripHtmlTagAndBlankspace($tds[0]) : '',                   // 序号
+                'term' => strlen($tds[1]) ? $this->stripHtmlTagAndBlankspace($tds[1]) : '',                 // 开设学期
+                'profession' => strlen($tds[2]) ? $this->stripHtmlTagAndBlankspace($tds[2]) : '',           // 专业名称
+                'courseCode' => strlen($tds[3]) ? $this->stripHtmlTagAndBlankspace($tds[3]) : '',           // 课程编号
+                'courseName' => strlen($tds[4]) ? $this->stripHtmlTagAndBlankspace($tds[4]) : '',           // 课程名称
+                'totalHours' => strlen($tds[5]) ? $this->stripHtmlTagAndBlankspace($tds[5]) : '',           // 总学时
+                'credit' => strlen($tds[6]) ? $this->stripHtmlTagAndBlankspace($tds[6]) : '',               // 学分
+                'accessMethod' => strlen($tds[7]) ? $this->stripHtmlTagAndBlankspace($tds[7]) : '',         // 考核方式
+                'department' => strlen($tds[8]) ? $this->stripHtmlTagAndBlankspace($tds[8]) : '',           // 开课单位
+                'referenceWeeklyHours' => strlen($tds[9]) ? $this->stripBlankspace($tds[9]) : '', // 参考周学时
+            ];
+        }
+
+        return [
+            'data' => $courses,
+            'pagination' => [
+                'total' => $total,
+                'currentPage' => $currentPage,
+                'totalPage' => $totalPage,
+            ]
+        ];
+    }
+
 }
