@@ -631,6 +631,36 @@ class Edusys
     }
 
     /**
+     * 获取培养方案查询选项
+     * @param string $college 学院
+     * @param string $grade 年级
+     * @param string $profession 专业
+     * @return array
+     * @throws Exception
+     */
+    public function trainingPlanOptions(string $college = '', string $grade = '', string $profession = ''): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $plan = new TrainingPlan($this->usercode, $this->cookie);
+        return $plan->options($college, $grade, $profession);
+    }
+
+    /**
+     * 教师查询专业培养方案
+     * @param string $grade 年级
+     * @param string $profession 专业
+     * @param int $page 页码
+     * @return array
+     * @throws Exception
+     */
+    public function professionTrainingPlan(string $grade, string $profession, int $page = 1): array
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $plan = new TrainingPlan($this->usercode, $this->cookie);
+        return $plan->professionTrainingPlan($grade, $profession, $page);
+    }
+
+    /**
      * 获取需评教学期批次
      * @return array
      * @throws Exception
