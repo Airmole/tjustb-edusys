@@ -135,9 +135,14 @@ class TrainingPlan extends Base
                 if (!empty($this->stripHtmlTagAndBlankspace($tds[3]))) {
                     preg_match('/(.*?)\(/', $tds[3], $status);
                     preg_match('/\((\d+)\)/', $tds[3], $score);
+                    $status = $status[1] ?? '';
+                    $score = $score[1] ?? '';
+                    if (strpos($this->stripHtmlTagAndBlankspace($tds[3]), '已修不及格') !== false) {
+                        $completion['status'] = '已修不及格';
+                    }
                     $completion = [
-                        'status' => $status[1] ?? '',
-                        'score' => $score[1] ?? ''
+                        'status' => $status,
+                        'score' => $score
                     ];
                 }
                 $courseNature = $this->stripBlankspace($tds[4]);          // 课程性质
