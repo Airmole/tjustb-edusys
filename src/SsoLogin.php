@@ -18,7 +18,7 @@ class SsoLogin extends Base
      */
     public function getLoginPara(): array
     {
-        $url = $this->ssoDomain . '/authserver/login?service=http%3A%2F%2Fjw.bkty.top%3A89%2Fjsxsd%2Fsso.jsp';
+        $url = $this->ssoDomain . '/authserver/login?service=' . urlencode($this->edusysUrl. '/jsxsd/sso.jsp');
         $result = $this->httpGet($url, '', '', 5, true);
         $httpCode = $result['code'];
         $response = $result['data'];
@@ -64,7 +64,7 @@ class SsoLogin extends Base
         // TODO 后续优化支持自动识别滑动验证码
         if ($this->checkNeedCaptcha($usercode, $cookie)) throw new Exception('需要识别验证码');
 
-        $url = $this->ssoDomain . '/authserver/login?service=http%3A%2F%2Fjw.bkty.top%3A89%2Fjsxsd%2Fsso.jsp';
+        $url = $this->ssoDomain . '/authserver/login?service=' . urlencode($this->edusysUrl. '/jsxsd/sso.jsp');
         $postData = [
             'username' => $usercode,
             'password' => $this->encryptPassword($password, $salt),
@@ -124,7 +124,7 @@ class SsoLogin extends Base
             'Cache-Control: no-cache',
             'Connection: keep-alive',
             'Content-Type: application/x-www-form-urlencoded',
-            'Origin: http://authserver.bkty.top',
+            'Origin: ' . $this->ssoDomain,
             'Pragma: no-cache',
             "Referer: {$url}",
             'Upgrade-Insecure-Requests: 1',
