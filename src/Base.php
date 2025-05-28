@@ -54,10 +54,10 @@ class Base
      */
     public function __construct()
     {
-        // 未配置教务URL 自动配置
-        if (empty($this->edusysUrl)) $this->setEdusysUrl();
         // 设置默认配置文件
         if (empty($this->configPath)) $this->setConfigPath();
+        // 未配置教务URL 自动配置
+        if (empty($this->edusysUrl)) $this->setEdusysUrl();
     }
 
     /**
