@@ -68,7 +68,7 @@ class Base
     public function setEdusysUrl(string $url = 'http://jw.bkty.top:89')
     {
         if (empty($url)) $url = 'http://jw.bkty.top:89';
-        $this->edusysUrl = $url;
+        $this->edusysUrl = $this->getConfig('EDUSYS_URL', $url);
     }
 
     /**
