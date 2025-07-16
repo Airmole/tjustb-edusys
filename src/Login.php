@@ -295,7 +295,7 @@ class Login extends Base
      */
     public function httpLoginPost(string $domain, string $cookie, string $post): array
     {
-        $url = $domain . '/jsxsd/Logon.do?method=logon';
+        $url = $domain . '/Logon.do?method=logon';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
