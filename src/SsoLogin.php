@@ -22,6 +22,7 @@ class SsoLogin extends Base
         $result = $this->httpGet($url, '', '', 5, true);
         $httpCode = $result['code'];
         $response = $result['data'];
+        if ($httpCode == 502) throw new Exception('学校系统不稳定，请稍候再试(cookie)');
         if ($httpCode == 0 || $httpCode >= 400) throw new Exception('获取cookie失败' . json_encode($response));
         preg_match('/Set-Cookie: route=(.*?); Path=\//i', $response, $routeId);
         preg_match('/Set-Cookie: JSESSIONID=(.*?); path=\//i', $response, $cookie);
@@ -62,7 +63,7 @@ class SsoLogin extends Base
         if (empty($salt)) throw new Exception('密码salt值不可为空');
         if (empty($execution)) throw new Exception('execution值不可为空');
         // TODO 后续优化支持自动识别滑动验证码
-        if ($this->checkNeedCaptcha($usercode, $cookie)) throw new Exception('需要识别验证码');
+        // if ($this->checkNeedCaptcha($usercode, $cookie)) throw new Exception('需要识别验证码');
 
         $url = $this->ssoDomain . '/authserver/login?service=' . urlencode($this->edusysUrl. '/jsxsd/sso.jsp');
         $postData = [
@@ -100,6 +101,7 @@ class SsoLogin extends Base
         if (strpos($response['data'], '该账号非常用账号或用户名密码有误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '您提供的用户名或者密码有误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '登录凭证不可用')) return ['code' => 403, 'data' => '登录凭证不可用'];
+        if ($response['code'] == 502) return ['code' => 502, 'data' => '学校系统不稳定，请稍后再试'];
         return  true;
     }
 
