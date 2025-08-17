@@ -344,7 +344,7 @@ class Base
      * 验证码识别
      * @param string $url
      * @param string $captchaBase64
-     * @return mixed
+     * @return array
      * @throws Exception
      */
     public function ocrPost(string $url, string $captchaBase64)
@@ -357,14 +357,15 @@ class Base
             'image' => $captchaBase64,
         ]);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
         $response = curl_exec($ch);
-
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
         $result = json_decode($response, true);
         if ($response === false) throw new Exception("验证码识别服务异常");
         if (empty($result['data'])) throw new Exception("验证码识别失败");
-        return $result['data'];
+
+        return ['code' => (int)$httpCode, 'data' => $result['data']];
     }
 
 }
