@@ -340,4 +340,31 @@ class Base
         return $result;
     }
 
+    /**
+     * 验证码识别
+     * @param string $url
+     * @param string $captchaBase64
+     * @return mixed
+     * @throws Exception
+     */
+    public function ocrPost(string $url, string $captchaBase64)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, [
+            'image' => $captchaBase64,
+        ]);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $response = curl_exec($ch);
+
+        curl_close($ch);
+        $result = json_decode($response, true);
+        if ($response === false) throw new Exception("验证码识别服务异常");
+        if (empty($result['data'])) throw new Exception("验证码识别失败");
+        return $result['data'];
+    }
+
 }

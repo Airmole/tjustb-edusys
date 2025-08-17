@@ -101,6 +101,7 @@ class SsoLogin extends Base
         if (strpos($response['data'], '该账号非常用账号或用户名密码有误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '您提供的用户名或者密码有误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '登录凭证不可用')) return ['code' => 403, 'data' => '登录凭证不可用'];
+        if (strpos($response['data'], '图形动态码错误')) return ['code' => 403, 'data' => '失败次数过多，请手动登录教务网后再试'];
         if ($response['code'] == 502) return ['code' => 502, 'data' => '学校系统不稳定，请稍后再试'];
         return  true;
     }
