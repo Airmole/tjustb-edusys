@@ -347,7 +347,7 @@ class Base
      * @return array
      * @throws Exception
      */
-    public function ocrPost(string $url, string $captchaBase64)
+    public function ocrPost(string $url, string $captchaBase64): array
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
