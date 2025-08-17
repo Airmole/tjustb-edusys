@@ -138,10 +138,11 @@ class Login extends Base
      * 验证码识别
      * @param string $captcha
      * @return string
+     * @throws Exception
      */
     public function captchaOcr(string $captcha): string
     {
-        $response = $this->httpPost($this->captchaOcr, $captcha);
+        $response = $this->ocrPost($this->captchaOcr, $captcha);
         if ($response['code'] == 0 || $response['code'] >= 400) return '';
         return $response['data'];
     }
@@ -170,7 +171,7 @@ class Login extends Base
             $validateResult = $this->validateLoginResult($response);
             if ($validateResult !== true) return $validateResult;
 
-            if ($response['code'] != 302) throw new Exception('login系统异常,请联系开发者');
+            if ($response['code'] != 302) throw new Exception('new login系统异常,请联系开发者');
             $redirectResponse = $this->httpGetFollowLocation($this->edusysUrl, $this->loginedLocationUrl($response['data']), $cookie);
             $url = $this->isStudent($usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp';
             $mainBoard = $this->httpGet($url, $redirectResponse['cookie'], $this->edusysUrl. '/');
