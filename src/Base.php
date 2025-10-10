@@ -135,7 +135,8 @@ class Base
         string $cookie = '',
         string $referer = '',
         int    $timeout = 5,
-        bool   $showHeader = false
+        bool   $showHeader = false,
+        bool   $followLocation = true
     ): array
     {
         if (strpos($url, 'http://') === false && strpos($url, 'https://') === false) {
@@ -161,7 +162,7 @@ class Base
             CURLOPT_TIMEOUT        => $timeout,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_FOLLOWLOCATION => $followLocation,
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => 'GET',
             CURLOPT_HTTPHEADER     => $headers,
