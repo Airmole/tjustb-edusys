@@ -28,7 +28,12 @@ class SsoLogin extends Base
         $this->cookie = $cookieString;
 
         $nextUrl = $this->getLocationFromRedirectHeader($result['data']);
-        $redirect = $this->httpGet($nextUrl, $cookieString, '', 5, true);
+        $redirect = $this->httpGet($nextUrl, $cookieString, '', 5, true, false);
+        if ($result['code'] == 200) {
+            $this->cookie = $cookieString;
+            return ['code' => 200, 'cookie' => $cookieString];
+        }
+
         if ($result['code'] != 302) throw new Exception('登录失败' . json_encode($result));
         $nextUrl = $this->getLocationFromRedirectHeader($redirect['data']);
         if (strpos($nextUrl, 'framework/xsMain.jsp') === false) {
