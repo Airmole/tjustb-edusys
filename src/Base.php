@@ -347,7 +347,7 @@ class Base
      * @return array
      * @throws Exception
      */
-    public function ocrPost(string $url, string $captchaBase64)
+    public function ocrPost(string $url, string $captchaBase64): array
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -366,6 +366,30 @@ class Base
         if (empty($result['data'])) throw new Exception("验证码识别失败");
 
         return ['code' => (int)$httpCode, 'data' => $result['data']];
+    }
+
+    /**
+     * 从响应头中获取Cookie
+     * @param string $key Cookie名称
+     * @param string $headerString 响应头字符串
+     * @return string Cookie值
+     */
+    public function getCookieFromHeader(string $key, string $headerString = ''): string
+    {
+        preg_match("/Set-Cookie: {$key}=(.*?);/", $headerString, $cookieValue);
+        return $cookieValue[1] ?? '';
+    }
+
+    /**
+     * 从响应头中获取跳转地址
+     * @param string $header 响应头字符串
+     * @return string 跳转地址
+     */
+    public function getLocationFromRedirectHeader(string $header = ''): string
+    {
+        preg_match('/Location: (.*)/', $header, $nextUrl);
+        $nextUrl = $nextUrl[1] ?? '';
+        return trim($nextUrl);
     }
 
 }

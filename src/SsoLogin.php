@@ -12,6 +12,32 @@ class SsoLogin extends Base
     public string $ssoDomain = 'http://authserver.bkty.top';
 
     /**
+     * SSO登录
+     * @param string $ticket authsys统一登录ticket
+     * @return array
+     * @throws Exception
+     */
+    public function ssoLogin(string $ticket): array
+    {
+        $url = '/jsxsd/sso.jsp?ticket=' . $ticket;
+        $result = $this->httpGet($url, '', '', 5, true);
+        if ($result['code'] != 302) throw new Exception('登录失败' . json_encode($result));
+        $jsessionIdCookie = $this->getCookieFromHeader('JSESSIONID', $result['data']);
+        $serverIdCookie = $this->getCookieFromHeader('SERVERID', $result['data']);
+        $cookieString = "JSESSIONID={$jsessionIdCookie}; SERVERID={$serverIdCookie}";
+        $this->cookie = $cookieString;
+
+        $nextUrl = $this->getLocationFromRedirectHeader($result['data']);
+        $redirect = $this->httpGet($nextUrl, $cookieString, '', 5, true);
+        if ($result['code'] != 302) throw new Exception('登录失败' . json_encode($result));
+        $nextUrl = $this->getLocationFromRedirectHeader($redirect['data']);
+        if (strpos($nextUrl, 'framework/xsMain.jsp') === false) {
+            throw new Exception('登录失败' . json_encode($result));
+        }
+        return ['code' => 200, 'cookie' => $cookieString];
+    }
+
+    /**
      * 获取登录参数
      * @return array
      * @throws Exception
