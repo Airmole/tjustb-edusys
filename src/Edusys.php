@@ -83,6 +83,18 @@ class Edusys
     }
 
     /**
+     * SSO登录
+     * @param string $ticket
+     * @return array
+     * @throws Exception
+     */
+    public function ssoLogin(string $ticket = ''): array
+    {
+        $login = new SsoLogin();
+        return $login->ssoLogin($ticket);
+    }
+
+    /**
      * 注销登录
      * @return array
      * @throws Exception
