@@ -143,8 +143,6 @@ class Base
             $url = $this->edusysUrl . $url;
         }
         $headers = [
-            'Connection: keep-alive',
-            'Upgrade-Insecure-Requests: 1',
             'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Encoding: gzip, deflate',
@@ -155,7 +153,7 @@ class Base
         $timeout = $this->getConfig('EDUSYS_TIMEOUT', $timeout);
         $ch = curl_init();
         curl_setopt_array($ch, array(
-            CURLOPT_URL            => $url,
+            CURLOPT_URL            => trim($url),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING       => 'gzip, deflate',
             CURLOPT_MAXREDIRS      => 10,
@@ -391,6 +389,84 @@ class Base
         preg_match('/Location: (.*)/', $header, $nextUrl);
         $nextUrl = $nextUrl[1] ?? '';
         return trim($nextUrl);
+    }
+
+
+    /**
+     * HTTP请求
+     * @param string $method 请求方式
+     * @param string $url 请求URL
+     * @param mixed $body 请求体
+     * @param mixed $cookie Cookie
+     * @param array $headers 请求头
+     * @param bool $showHeaders 是否返回请求头
+     * @param bool $followLocation 是否跟随跳转
+     * @param int $timeout 超时时间
+     * @return array 响应结果
+     */
+    public function httpRequest(
+        string $method = 'GET',
+        string $url = '',
+        string $body = '',
+        string $cookie = '',
+        array  $headers = [],
+        bool   $showHeaders = false,
+        bool   $followLocation = false,
+        int    $timeout = 5
+    ): array
+    {
+        if (strpos($url, 'http://') === false && strpos($url, 'https://') === false) {
+            $url = $this->edusysUrl . $url;
+        }
+        $url = trim($url);
+
+        $defaultHeaders = [
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
+            'Accept-Encoding: gzip, deflate',
+            'Accept-Language: zh',
+        ];
+        $headers = array_merge($defaultHeaders, $headers);
+
+        if (is_string($cookie)) {
+            $cookie = trim($cookie);
+            $headers[] = "Cookie: {$cookie}";
+        }
+
+        $timeout = (int)$this->getConfig('EDUSYS_TIMEOUT', $timeout);
+
+        $requestOptions = [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => 'gzip, deflate',
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_FOLLOWLOCATION => $followLocation,
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_HEADER => $showHeaders,
+        ];
+
+        if (!empty($body)) {
+            $requestOptions[CURLOPT_POSTFIELDS] = is_array($body) ? json_encode($body) : $body;
+        }
+
+        $ch = curl_init();
+        curl_setopt_array($ch, $requestOptions);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($response === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            return ['code' => 0, 'data' => 'cURL Error: ' . $error];
+        }
+        curl_close($ch);
+
+        return ['code' => (int)$httpCode, 'data' => $response];
     }
 
 }
