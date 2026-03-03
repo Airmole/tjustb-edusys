@@ -206,15 +206,19 @@ class Base
         $origin = substr($domain[0], 0, -1);
 
         $headers = [];
+        $headers[] = 'Host: jw.bkty.top';
+        $headers[] = 'Connection: keep-alive';
+        $headers[] = 'sec-ch-ua: "Not:A-Brand";v="99", "Microsoft Edge";v="145", "Chromium";v="145"';
+        $headers[] = 'sec-ch-ua-mobile: ?0';
+        $headers[] = 'Upgrade-Insecure-Requests: 1';
         $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
         $headers[] = 'Accept-Language: zh-CN,zh;q=0.9';
         $headers[] = 'Cache-Control: no-cache';
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
-        $headers[] = 'Pragma: no-cache';
-        $headers[] = 'Upgrade-Insecure-Requests: 1';
+        $headers[] = 'Sec-Fetch-Site: same-origin';
+        $headers[] = 'Sec-Fetch-Mode: navigate';
+        $headers[] = 'Sec-Fetch-User: ?1';
+        $headers[] = 'Sec-Fetch-Dest: iframe';
         $headers[] = 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36';
-        $headers[] = "Origin: {$origin}";
         if ($cookie !== '') $headers[] = "Cookie: {$cookie}";
         if ($referer !== '') $headers[] = "Referer: {$referer}";
         $timeout = $this->getConfig('EDUSYS_TIMEOUT', $timeout);
@@ -227,6 +231,8 @@ class Base
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
@@ -386,7 +392,7 @@ class Base
      */
     public function getLocationFromRedirectHeader(string $header = ''): string
     {
-        preg_match('/Location: (.*)/', $header, $nextUrl);
+        preg_match('/Location: (.*)/i', $header, $nextUrl);
         $nextUrl = $nextUrl[1] ?? '';
         return trim($nextUrl);
     }
@@ -419,6 +425,9 @@ class Base
             $url = $this->edusysUrl . $url;
         }
         $url = trim($url);
+        if (strpos($this->edusysUrl, 'https://') == 0 && strpos($url, 'http://') == 0) {
+            $url = str_replace('http://', 'https://', $url);
+        }
 
         $defaultHeaders = [
             'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
