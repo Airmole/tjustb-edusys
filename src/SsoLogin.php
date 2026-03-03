@@ -21,37 +21,50 @@ class SsoLogin extends Base
     {
         $url = '/jsxsd/sso.jsp?ticket=' . $ticket;
         $result = $this->httpRequest('GET', $url, '', '', [
+            'Host: jw.bkty.top',
+            'Connection: keep-alive',
             'Upgrade-Insecure-Requests: 1',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Sec-Fetch-Site: none',
+            'Sec-Fetch-Mode: navigate',
+            'Sec-Fetch-User: ?1',
+            'Sec-Fetch-Dest: document',
+            'sec-ch-ua: "Not:A-Brand";v="99", "Microsoft Edge";v="145", "Chromium";v="145"'
         ], true);
         if ($result['code'] != 302) throw new Exception('登录失败' . json_encode($result));
         $jsessionIdCookie = $this->getCookieFromHeader('JSESSIONID', $result['data']);
         $serverIdCookie = $this->getCookieFromHeader('SERVERID', $result['data']);
-        $cookieString = "JSESSIONID={$jsessionIdCookie}; SERVERID={$serverIdCookie}";
+        $cookieString = "JSESSIONID={$jsessionIdCookie}; platformMultilingual=zh_CN; SERVERID={$serverIdCookie}";
         $this->cookie = $cookieString;
 
+        // 访问 /jsxsd/sso.jsp;jsessionid=xxx
         $nextUrl = $this->getLocationFromRedirectHeader($result['data']);
         $redirect = $this->httpRequest('GET', $nextUrl, '', $this->cookie, [
             'Upgrade-Insecure-Requests: 1',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6'
         ], true);
-        if ($redirect['code'] != 302) throw new Exception('登录失败' . json_encode($redirect));
+        if ($redirect['code'] != 302) {
+            throw new Exception('登录失败1' . json_encode($redirect));
+        }
+
+        // 访问 /jsxsd/framework/xsMain.jsp
         $nextUrl = $this->getLocationFromRedirectHeader($redirect['data']);
         $redirect = $this->httpRequest('GET', $nextUrl, '', $this->cookie, [
             'Upgrade-Insecure-Requests: 1',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6'
         ], true);
-        if ($redirect['code'] != 200) throw new Exception('登录失败' . json_encode($redirect));
-
+//        var_dump($redirect);die;
+        if ($redirect['code'] != 200) throw new Exception('登录失败2' . json_encode($redirect));
         $xsMainNew = $this->httpRequest('GET', '/jsxsd/framework/xsMain_new.jsp?t1=1', '', $this->cookie, [
             'Upgrade-Insecure-Requests: 1',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             "Referer: {$this->edusysUrl}/jsxsd/framework/xsMain.jsp"
         ]);
-        if ($xsMainNew['code'] != 200) throw new Exception('登录失败' . json_encode($xsMainNew));
+//        var_dump($xsMainNew);die;
+        if ($xsMainNew['code'] != 200) throw new Exception('登录失败3' . json_encode($xsMainNew));
         return ['code' => 200, 'cookie' => $this->cookie, 'data' => $redirect['data']];
     }
 
