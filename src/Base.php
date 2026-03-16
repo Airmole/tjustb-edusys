@@ -281,7 +281,7 @@ class Base
      */
     public function isTeacher(string $uid): bool
     {
-        if (strlen($uid) < 8) return true;
+        if (strlen($uid) < 8 || strpos($uid, 'T') == 0) return true;
         return false;
     }
 
@@ -292,7 +292,7 @@ class Base
      */
     public function isStudent(string $uid): bool
     {
-        if (strlen($uid) < 8) return false;
+        if (strlen($uid) < 8 || strpos($uid, 'T') !== 0) return false;
         return true;
     }
 
