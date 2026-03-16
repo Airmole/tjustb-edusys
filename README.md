@@ -1,6 +1,6 @@
 # tjustb-edusys
 
-北京科技大学天津学院教务系统客户端（http://jw.bkty.top:89）
+北京科技大学天津学院教务系统客户端（https://jw.bkty.top）
 
 # Requirement
 
@@ -47,7 +47,7 @@ print_r($score);
 |  变量名 | 描述         | 默认                    | 可选 |
 | --- |------------|-----------------------|----|
 | EDUSYS_OCR_URL | 验证码识别接口地址  |                       | 是  |
-| EDUSYS_URL | 访问教务系统路径   | http://jw.bkty.top:89 | 否  |
+| EDUSYS_URL | 访问教务系统路径   | https://jw.bkty.top | 否  |
  | EDUSYS_TIMEOUT | 请求超时时间(秒数) | 5                     | 否  |
 
 ## 适用学校系统

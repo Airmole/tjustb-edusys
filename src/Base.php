@@ -65,9 +65,9 @@ class Base
      * @param string $url
      * @return void
      */
-    public function setEdusysUrl(string $url = 'http://jw.bkty.top:89')
+    public function setEdusysUrl(string $url = 'https://jw.bkty.top')
     {
-        if (empty($url)) $url = 'http://jw.bkty.top:89';
+        if (empty($url)) $url = 'https://jw.bkty.top';
         $this->edusysUrl = $this->getConfig('EDUSYS_URL', $url);
     }
 
@@ -116,7 +116,7 @@ class Base
      * @param string $url 教务系统URL
      * @return void
      */
-    public function setEdusysUrlForce(string $url = 'http://jw.bkty.top:89')
+    public function setEdusysUrlForce(string $url = 'https://jw.bkty.top')
     {
         $this->edusysUrl = $url;
     }
