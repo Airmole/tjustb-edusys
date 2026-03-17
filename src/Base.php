@@ -292,7 +292,7 @@ class Base
      */
     public function isStudent(string $uid): bool
     {
-        if (strlen($uid) < 8 || strpos($uid, 'T') !== 0) return false;
+        if (strlen($uid) < 8 || strpos($uid, 'T') == 0) return false;
         return true;
     }
 
