@@ -177,7 +177,7 @@ class Profile extends Base
         $referer = $this->edusysUrl . '/jsxsd/grxx/xsxx';
         $response = $this->httpGet('/jsxsd/grxx/xszpLoad', $this->cookie, $referer);
         if ($response['code'] !== Base::CODE_SUCCESS) return '';
-        if (strpos($response['data'], 'authserver.bkty.top/authserver/login')) return '';
+        if (strpos($response['data'], 'authserver.tjustb.cn/authserver/login')) return '';
         return base64_encode($response['data']);
     }
 
