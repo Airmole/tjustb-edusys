@@ -9,7 +9,7 @@ class SsoLogin extends Base
     /**
      * @var string SSO登录地址
      */
-    public string $ssoDomain = 'http://authserver.bkty.top';
+    public string $ssoDomain = 'https://authserver.tjustb.cn';
 
     /**
      * SSO登录
@@ -21,7 +21,7 @@ class SsoLogin extends Base
     {
         $url = '/jsxsd/sso.jsp?ticket=' . $ticket;
         $result = $this->httpRequest('GET', $url, '', '', [
-            'Host: jw.bkty.top',
+            'Host: jw.tjustb.cn',
             'Connection: keep-alive',
             'Upgrade-Insecure-Requests: 1',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',

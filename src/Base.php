@@ -65,9 +65,9 @@ class Base
      * @param string $url
      * @return void
      */
-    public function setEdusysUrl(string $url = 'https://jw.bkty.top')
+    public function setEdusysUrl(string $url = 'https://jw.tjustb.cn')
     {
-        if (empty($url)) $url = 'https://jw.bkty.top';
+        if (empty($url)) $url = 'https://jw.tjustb.cn';
         $this->edusysUrl = $this->getConfig('EDUSYS_URL', $url);
     }
 
@@ -116,7 +116,7 @@ class Base
      * @param string $url 教务系统URL
      * @return void
      */
-    public function setEdusysUrlForce(string $url = 'https://jw.bkty.top')
+    public function setEdusysUrlForce(string $url = 'https://jw.tjustb.cn')
     {
         $this->edusysUrl = $url;
     }
@@ -206,7 +206,7 @@ class Base
         $origin = substr($domain[0], 0, -1);
 
         $headers = [];
-        $headers[] = 'Host: jw.bkty.top';
+        $headers[] = 'Host: jw.tjustb.cn';
         $headers[] = 'Connection: keep-alive';
         $headers[] = 'sec-ch-ua: "Not:A-Brand";v="99", "Microsoft Edge";v="145", "Chromium";v="145"';
         $headers[] = 'sec-ch-ua-mobile: ?0';
@@ -307,7 +307,7 @@ class Base
         if (strpos($html, '该帐号不存在或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($html, '您的账号在其它地方登录')) return ['code' => 403, 'data' => '您的账号在其它地方登录'];
         if (strpos($html, '请先登录系统')) return ['code' => 403, 'data' => '未登录,请重新登录'];
-        if (strpos($html, 'authserver.bkty.top/authserver/login')) return ['code' => 403, 'data' => '未登录,请重新登录'];
+        if (strpos($html, 'authserver.tjustb.cn/authserver/login')) return ['code' => 403, 'data' => '未登录,请重新登录'];
         if (strpos($html, '非法访问')) return ['code' => 403, 'data' => '账号身份没有访问权限'];
         return true;
     }

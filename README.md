@@ -1,6 +1,6 @@
 # tjustb-edusys
 
-北京科技大学天津学院教务系统客户端（https://jw.bkty.top）
+北京科技大学天津学院教务系统客户端（https://jw.tjustb.cn）
 
 # Requirement
 
@@ -44,11 +44,11 @@ print_r($score);
 
 读取环境变量，请将.env文件放在引用项目根目录下，并配置如下内容：
 
-|  变量名 | 描述         | 默认                    | 可选 |
-| --- |------------|-----------------------|----|
-| EDUSYS_OCR_URL | 验证码识别接口地址  |                       | 是  |
-| EDUSYS_URL | 访问教务系统路径   | https://jw.bkty.top | 否  |
- | EDUSYS_TIMEOUT | 请求超时时间(秒数) | 5                     | 否  |
+|  变量名 | 描述         | 默认                   | 可选 |
+| --- |------------|----------------------|----|
+| EDUSYS_OCR_URL | 验证码识别接口地址  |                      | 是  |
+| EDUSYS_URL | 访问教务系统路径   | https://jw.tjustb.cn | 否  |
+ | EDUSYS_TIMEOUT | 请求超时时间(秒数) | 5                    | 否  |
 
 ## 适用学校系统
 
