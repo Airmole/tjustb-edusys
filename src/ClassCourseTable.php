@@ -86,6 +86,8 @@ class ClassCourseTable extends AbstractService
      * @param string $weekEnd 结束周（值1~30）
      * @param string $dayOfWeekStart 开始星期几（值1~7）
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
+     * @param string $serialNoStart 开始节数（暂不生效）
+     * @param string $serialNoEnd 结束节数（暂不生效）
      * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
@@ -118,6 +120,8 @@ class ClassCourseTable extends AbstractService
             'zc2'      => $weekEnd,
             'skxq1'    => $dayOfWeekStart,
             'skxq2'    => $dayOfWeekEnd,
+            // 'jc1'      => $serialNoStart,
+            // 'jc2'      => $serialNoEnd
         ];
         $post = http_build_query($postPara);
         $referer = $this->edusysUrl . '/jsxsd/kbcx/kbxx_xzb';
