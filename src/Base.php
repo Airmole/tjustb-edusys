@@ -29,7 +29,7 @@ class Base
      * @var string 账号
      */
     public string $usercode;
-    
+
     /**
      * @var string 可用cookie值（仅登录成功后赋值）
      */
@@ -51,7 +51,15 @@ class Base
     public const END_ATS = ['09:35', '11:30', '14:45', '16:35', '18:25', '21:35'];
 
     /**
+     * 默认User-Agent
      */
+    protected const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36';
+
+    /**
+     * 默认请求超时时间（秒）
+     */
+    protected const DEFAULT_TIMEOUT = 5;
+
     public function __construct()
     {
         // 设置默认配置文件
@@ -72,12 +80,59 @@ class Base
     }
 
     /**
+     * 强制设置教务URL（忽略配置文件）
+     * @param string $url 教务系统URL
+     * @return void
+     */
+    public function setEdusysUrlForce(string $url = 'https://jw.tjustb.cn')
+    {
+        $this->edusysUrl = $url;
+    }
+
+    /**
+     * 设置配置文件路径
+     * @param string $path
+     * @return void
+     */
+    public function setConfigPath(string $path = '')
+    {
+        $defaultPath = $_SERVER['DOCUMENT_ROOT'] . '/../.env';
+        if ($path === '') $path = $defaultPath;
+        $this->configPath = $path;
+    }
+
+    /**
+     * 获取配置项
+     * @param string $key
+     * @param mixed $default
+     * @param string $path
+     * @return mixed|null
+     */
+    public function getConfig(string $key, $default = null, string $path = '')
+    {
+        $configPath = $path !== '' ? $path : $this->configPath;
+        if (!file_exists($configPath)) return $default;
+
+        $lines = file($configPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line) || strpos($line, '#') === 0) continue;
+            list($configKey, $configValue) = array_pad(explode('=', $line, 2), 2, '');
+            if (trim($configKey) === $key) {
+                $configValue = trim($configValue);
+                return $configValue !== '' ? $configValue : $default;
+            }
+        }
+        return $default;
+    }
+
+    /**
      * 获取系统状态码
      * @param string $url
      * @param int $timeout
-     * @return mixed
+     * @return int
      */
-    public function getEdusysStatusCode(string $url, int $timeout = 5): int
+    public function getEdusysStatusCode(string $url, int $timeout = self::DEFAULT_TIMEOUT): int
     {
         $url = $url . '/';
         $ch = curl_init();
@@ -100,25 +155,88 @@ class Base
     }
 
     /**
-     * 设置配置文件路径
-     * @param string $path
-     * @return void
+     * 统一 HTTP 请求方法
+     * @param string $method 请求方式 GET/POST
+     * @param string $url 请求URL（支持相对路径）
+     * @param string $body POST数据
+     * @param string $cookie Cookie
+     * @param string $referer Referer
+     * @param array $headers 自定义请求头
+     * @param bool $showHeader 是否返回响应头
+     * @param bool $followLocation 是否跟随跳转
+     * @param int $timeout 超时时间（秒）
+     * @return array ['code' => int, 'data' => string]
      */
-    public function setConfigPath(string $path = '')
+    public function httpRequest(
+        string $method = 'GET',
+        string $url = '',
+        string $body = '',
+        string $cookie = '',
+        string $referer = '',
+        array  $headers = [],
+        bool   $showHeader = false,
+        bool   $followLocation = false,
+        int    $timeout = self::DEFAULT_TIMEOUT
+    ): array
     {
-        $defaultPath = $_SERVER['DOCUMENT_ROOT'] . '/../.env';
-        if ($path === '') $path = $defaultPath;
-        $this->configPath = $path;
-    }
+        // 补全URL
+        if (strpos($url, 'http://') === false && strpos($url, 'https://') === false) {
+            $url = $this->edusysUrl . $url;
+        }
+        $url = trim($url);
+        // https降级http修正
+        if (strpos($this->edusysUrl, 'https://') === 0 && strpos($url, 'http://') === 0) {
+            $url = str_replace('http://', 'https://', $url);
+        }
 
-    /**
-     * 强制设置教务URL
-     * @param string $url 教务系统URL
-     * @return void
-     */
-    public function setEdusysUrlForce(string $url = 'https://jw.tjustb.cn')
-    {
-        $this->edusysUrl = $url;
+        $method = strtoupper($method);
+        $timeout = (int)$this->getConfig('EDUSYS_TIMEOUT', $timeout);
+
+        // 组装请求头
+        $defaultHeaders = [
+            'User-Agent: ' . self::DEFAULT_USER_AGENT,
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Encoding: gzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9',
+            'Connection: keep-alive',
+        ];
+        if (!empty($referer)) $defaultHeaders[] = "Referer: {$referer}";
+        if (!empty($cookie)) $defaultHeaders[] = "Cookie: {$cookie}";
+        $headers = array_merge($defaultHeaders, $headers);
+
+        $requestOptions = [
+            CURLOPT_URL            => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => 'gzip, deflate',
+            CURLOPT_TIMEOUT        => $timeout,
+            CURLOPT_CONNECTTIMEOUT => $timeout,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_FOLLOWLOCATION => $followLocation,
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => $method,
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_HEADER         => $showHeader,
+        ];
+
+        if ($method === 'POST' && $body !== '') {
+            $requestOptions[CURLOPT_POSTFIELDS] = $body;
+        }
+
+        $ch = curl_init();
+        curl_setopt_array($ch, $requestOptions);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($response === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            return ['code' => 0, 'data' => 'cURL Error: ' . $error];
+        }
+        curl_close($ch);
+
+        return ['code' => (int)$httpCode, 'data' => $response];
     }
 
     /**
@@ -128,64 +246,22 @@ class Base
      * @param string $referer header->referer
      * @param int $timeout 请求超时时间（秒）
      * @param bool $showHeader 返回信息包含Header
+     * @param bool $followLocation 是否跟随跳转
      * @return array
      */
     public function httpGet(
         string $url,
         string $cookie = '',
         string $referer = '',
-        int    $timeout = 5,
+        int    $timeout = self::DEFAULT_TIMEOUT,
         bool   $showHeader = false,
         bool   $followLocation = true
     ): array
     {
-        if (strpos($url, 'http://') === false && strpos($url, 'https://') === false) {
-            $url = $this->edusysUrl . $url;
-        }
-        $headers = [
-            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Accept-Encoding: gzip, deflate',
-            'Accept-Language: zh',
-        ];
-        if (!empty($referer)) $headers[] = "Referer: {$referer}";
-        if (!empty($cookie)) $headers[] = "Cookie: {$cookie}";
-        $timeout = $this->getConfig('EDUSYS_TIMEOUT', $timeout);
-        $ch = curl_init();
-        curl_setopt_array($ch, array(
-            CURLOPT_URL            => trim($url),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING       => 'gzip, deflate',
-            CURLOPT_MAXREDIRS      => 10,
-            CURLOPT_TIMEOUT        => $timeout,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_FOLLOWLOCATION => $followLocation,
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST  => 'GET',
-            CURLOPT_HTTPHEADER     => $headers,
-            CURLOPT_HEADER         => $showHeader,
-        ));
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        return ['code' => (int)$httpCode, 'data' => $response];
-    }
-
-    /**
-     * 获取配置项
-     * @param string $key
-     * @param $default
-     * @param string $path
-     * @return mixed|null
-     */
-    public function getConfig(string $key, $default = null, string $path = '')
-    {
-        $configs = $this->configPath;
-        if (!file_exists($configs) && $path === '') return $default;
-        preg_match("/{$key}=(.*?)\n/", file_get_contents($configs), $matchedConfig);
-        if (empty($matchedConfig) && $path === '') return $default;
-        return $matchedConfig[1] ?: $default;
+        return $this->httpRequest(
+            'GET', $url, '', $cookie, $referer,
+            [], $showHeader, $followLocation, $timeout
+        );
     }
 
     /**
@@ -197,46 +273,13 @@ class Base
      * @param int $timeout 请求超时时间(秒)
      * @return array
      */
-    public function httpPost(string $url, string $post, string $cookie = '', string $referer = '', int $timeout = 5): array
+    public function httpPost(string $url, string $post, string $cookie = '', string $referer = '', int $timeout = self::DEFAULT_TIMEOUT): array
     {
-        if (strpos($url, 'http://') === false && strpos($url, 'https://') === false) {
-            $url = $this->edusysUrl . $url;
-        }
-        preg_match('/^http:\/\/(.*?)\/|^https:\/\/(.*?)\//', $url, $domain);
-        $origin = substr($domain[0], 0, -1);
-
-        $headers = [];
-        $headers[] = 'Host: jw.tjustb.cn';
-        $headers[] = 'Connection: keep-alive';
-        $headers[] = 'sec-ch-ua: "Not:A-Brand";v="99", "Microsoft Edge";v="145", "Chromium";v="145"';
-        $headers[] = 'sec-ch-ua-mobile: ?0';
-        $headers[] = 'Upgrade-Insecure-Requests: 1';
-        $headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
-        $headers[] = 'Accept-Language: zh-CN,zh;q=0.9';
-        $headers[] = 'Cache-Control: no-cache';
-        $headers[] = 'Sec-Fetch-Site: same-origin';
-        $headers[] = 'Sec-Fetch-Mode: navigate';
-        $headers[] = 'Sec-Fetch-User: ?1';
-        $headers[] = 'Sec-Fetch-Dest: iframe';
-        $headers[] = 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36';
-        if ($cookie !== '') $headers[] = "Cookie: {$cookie}";
-        if ($referer !== '') $headers[] = "Referer: {$referer}";
-        $timeout = $this->getConfig('EDUSYS_TIMEOUT', $timeout);
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        return ['code' => (int)$httpCode, 'data' => $response];
+        return $this->httpRequest(
+            'POST', $url, $post, $cookie, $referer,
+            ['Content-Type: application/x-www-form-urlencoded'],
+            false, false, $timeout
+        );
     }
 
     /**
@@ -281,8 +324,7 @@ class Base
      */
     public function isTeacher(string $uid): bool
     {
-        if (strlen($uid) < 8 || strpos($uid, 'T') == 0) return true;
-        return false;
+        return strlen($uid) < 8 || strpos($uid, 'T') === 0;
     }
 
     /**
@@ -292,8 +334,7 @@ class Base
      */
     public function isStudent(string $uid): bool
     {
-        if (strlen($uid) < 8 || strpos($uid, 'T') === 0) return false;
-        return true;
+        return !$this->isTeacher($uid);
     }
 
     /**
@@ -338,7 +379,7 @@ class Base
             if ($checkedPattern === '0') {
                 $checked = $index === 0;
             } else {
-                $checked = strpos($checkeds[$index], 'selected') !== false;
+                $checked = isset($checkeds[$index]) && strpos($checkeds[$index], 'selected') !== false;
             }
             $result[] = ['name' => $name, 'value' => $values[$index], 'checked' => $checked];
         }
@@ -397,85 +438,14 @@ class Base
         return trim($nextUrl);
     }
 
-
     /**
-     * HTTP请求
-     * @param string $method 请求方式
-     * @param string $url 请求URL
-     * @param mixed $body 请求体
-     * @param mixed $cookie Cookie
-     * @param array $headers 请求头
-     * @param bool $showHeaders 是否返回请求头
-     * @param bool $followLocation 是否跟随跳转
-     * @param int $timeout 超时时间
-     * @return array 响应结果
+     * 检查并抛出cookie无效异常
+     * @param string $html
+     * @throws Exception
      */
-    public function httpRequest(
-        string $method = 'GET',
-        string $url = '',
-        string $body = '',
-        string $cookie = '',
-        array  $headers = [],
-        bool   $showHeaders = false,
-        bool   $followLocation = false,
-        int    $timeout = 5
-    ): array
+    protected function validateHtml(string $html): void
     {
-        if (strpos($url, 'http://') === false && strpos($url, 'https://') === false) {
-            $url = $this->edusysUrl . $url;
-        }
-        $url = trim($url);
-        if (strpos($this->edusysUrl, 'https://') == 0 && strpos($url, 'http://') == 0) {
-            $url = str_replace('http://', 'https://', $url);
-        }
-
-        $defaultHeaders = [
-            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36',
-            'Accept-Encoding: gzip, deflate',
-            'Accept-Language: zh',
-        ];
-        $headers = array_merge($defaultHeaders, $headers);
-
-        if (is_string($cookie)) {
-            $cookie = trim($cookie);
-            $headers[] = "Cookie: {$cookie}";
-        }
-
-        $timeout = (int)$this->getConfig('EDUSYS_TIMEOUT', $timeout);
-
-        $requestOptions = [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => 'gzip, deflate',
-            CURLOPT_TIMEOUT => $timeout,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_FOLLOWLOCATION => $followLocation,
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_HEADER => $showHeaders,
-        ];
-
-        if (!empty($body)) {
-            $requestOptions[CURLOPT_POSTFIELDS] = is_array($body) ? json_encode($body) : $body;
-        }
-
-        $ch = curl_init();
-        curl_setopt_array($ch, $requestOptions);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if ($response === false) {
-            $error = curl_error($ch);
-            curl_close($ch);
-            return ['code' => 0, 'data' => 'cURL Error: ' . $error];
-        }
-        curl_close($ch);
-
-        return ['code' => (int)$httpCode, 'data' => $response];
+        $result = $this->checkCookieByHtml($html);
+        if ($result !== true) throw new Exception($result['data']);
     }
-
 }

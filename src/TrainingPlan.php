@@ -7,21 +7,8 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 培养方案
  */
-class TrainingPlan extends Base
+class TrainingPlan extends AbstractService
 {
-    /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
     /**
      * 获取培养方案
      * @return array
@@ -32,8 +19,7 @@ class TrainingPlan extends Base
         if ($this->isTeacher($this->usercode)) throw new Exception('教师不适用培养计划');
         $referer = $this->edusysUrl . '/jsxsd/framework/xsMain.jsp';
         $html = $this->httpGet('/jsxsd/pyfa/topyfamx', $this->cookie, $referer);
-        $validHtml = $this->checkCookieByHtml($html['data']);
-        if ($validHtml !== true) throw new Exception($validHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取培养计划失败');
         return $this->formatTrainingPlan($html['data']);
     }
@@ -48,7 +34,7 @@ class TrainingPlan extends Base
     {
         $title = '';           // 标题
         $cultivateTarget = ''; // 培养目标
-        $description = '';      // 详细说明
+        $description = '';     // 详细说明
 
         preg_match('/<caption.*?>(.*?)<\/caption>/', $html, $title);
         $title = $title[1] ?? '';
@@ -99,9 +85,9 @@ class TrainingPlan extends Base
             $due = $due[1] ? $this->stripBlankspace($due[1]) : '';
             $existing = $existing[1] ? $this->stripBlankspace($existing[1]) : '';
             $content[$index]['courseSystem'] = [
-                'title' => $courseSystemTitle, // 课程体系名称
-                'due' => $due,               // 课程体系应修
-                'existing' => $existing           // 课程体系已修
+                'title' => $courseSystemTitle,
+                'due' => $due,
+                'existing' => $existing
             ];
 
             // 课程体系小计
@@ -124,13 +110,13 @@ class TrainingPlan extends Base
             foreach ($courseHtmls[0] as $courseHtml) {
                 preg_match_all('/<TD.*?>(.*?)<\/TD>/', $courseHtml, $tds);
                 $tds = $tds[1] ?? [];
-                $tds = array_filter($tds, function ($item) { // 移除跨列的“课程体系”单元格
+                $tds = array_filter($tds, function ($item) {
                     return !(strpos($item, '应修') !== false);
                 });
-                $tds = array_values($tds); // 键名重新从0开始排序
-                $group = $this->stripBlankspace($tds[0]); // 选课组
+                $tds = array_values($tds);
+                $group = $this->stripBlankspace($tds[0]);      // 选课组
                 $courseCode = $this->stripBlankspace($tds[1]); // 课程编号
-                $courseName = $this->stripBlankspace($tds[2]); //课程名称
+                $courseName = $this->stripBlankspace($tds[2]); // 课程名称
                 $completion = null; // 完成情况
                 if (!empty($this->stripHtmlTagAndBlankspace($tds[3]))) {
                     preg_match('/(.*?)\(/', $tds[3], $status);
@@ -199,8 +185,8 @@ class TrainingPlan extends Base
 
         return [
             'title' => $title,
-            'cultivateTarget' => $cultivateTarget, // 培养目标
-            'description' => $description,           // 详细说明
+            'cultivateTarget' => $cultivateTarget,
+            'description' => $description,
             'courseList' => [
                 'content' => $content,
                 'summary' => $summary
@@ -221,8 +207,7 @@ class TrainingPlan extends Base
         if ($this->isStudent($this->usercode)) throw new Exception('仅适用于教师账号');
         $postString = "xsyx={$college}&xsnj={$grade}&xszy={$profession}";
         $html = $this->httpPost('/jsxsd/jspyfa/pyfa_find', $postString, $this->cookie);
-        $validHtml = $this->checkCookieByHtml($html['data']);
-        if ($validHtml !== true) throw new Exception($validHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('教师查询培养方案筛选项失败');
         return $this->formatTrainingPlanOptions($html['data']);
     }
@@ -237,15 +222,15 @@ class TrainingPlan extends Base
     {
         preg_match('/院系名称.*?所在年级/s', $html, $collegeHtml);
         $collegeHtml = $collegeHtml[0] ?? '';
-        $college = $this->formatOption($collegeHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/',  '/<option(.*?)<\/option>/');
+        $college = $this->formatOption($collegeHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/', '/<option(.*?)<\/option>/');
 
         preg_match('/所在年级.*?专业名称/s', $html, $gradeHtml);
         $gradeHtml = $gradeHtml[0] ?? '';
-        $grade = $this->formatOption($gradeHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/',  '/<option(.*?)<\/option>/');
+        $grade = $this->formatOption($gradeHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/', '/<option(.*?)<\/option>/');
 
         preg_match('/专业名称.*?查询/s', $html, $professionHtml);
         $professionHtml = $professionHtml[0] ?? '';
-        $profession = $this->formatOption($professionHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/',  '/<option(.*?)<\/option>/');
+        $profession = $this->formatOption($professionHtml, '/>(.*?)<\/option>/', '/value="(.*?)">/', '/<option(.*?)<\/option>/');
 
         return [
             'college' => $college,
@@ -268,8 +253,7 @@ class TrainingPlan extends Base
         if (empty($grade) || empty($profession)) throw new Exception('年级或专业不能为空');
         $postString = "xsnj={$grade}&xszy={$profession}&pageIndex={$page}";
         $html = $this->httpPost('/jsxsd/jspyfa/zypyfa_query', $postString, $this->cookie);
-        $validHtml = $this->checkCookieByHtml($html['data']);
-        if ($validHtml !== true) throw new Exception($validHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('教师查询培养方案筛失败');
         return $this->formatProfessionTrainingPlan($html['data']);
     }
@@ -298,16 +282,16 @@ class TrainingPlan extends Base
             preg_match_all('/<td.*?>(.*?)<\/td>/', $tr, $tds);
             $tds = $tds[1] ?? '';
             $courses[] = [
-                'no' => strlen($tds[0]) ? $this->stripHtmlTagAndBlankspace($tds[0]) : '',                   // 序号
-                'term' => strlen($tds[1]) ? $this->stripHtmlTagAndBlankspace($tds[1]) : '',                 // 开设学期
-                'profession' => strlen($tds[2]) ? $this->stripHtmlTagAndBlankspace($tds[2]) : '',           // 专业名称
-                'courseCode' => strlen($tds[3]) ? $this->stripHtmlTagAndBlankspace($tds[3]) : '',           // 课程编号
-                'courseName' => strlen($tds[4]) ? $this->stripHtmlTagAndBlankspace($tds[4]) : '',           // 课程名称
-                'totalHours' => strlen($tds[5]) ? $this->stripHtmlTagAndBlankspace($tds[5]) : '',           // 总学时
-                'credit' => strlen($tds[6]) ? $this->stripHtmlTagAndBlankspace($tds[6]) : '',               // 学分
-                'accessMethod' => strlen($tds[7]) ? $this->stripHtmlTagAndBlankspace($tds[7]) : '',         // 考核方式
-                'department' => strlen($tds[8]) ? $this->stripHtmlTagAndBlankspace($tds[8]) : '',           // 开课单位
-                'referenceWeeklyHours' => strlen($tds[9]) ? $this->stripBlankspace($tds[9]) : '', // 参考周学时
+                'no' => strlen($tds[0]) ? $this->stripHtmlTagAndBlankspace($tds[0]) : '',
+                'term' => strlen($tds[1]) ? $this->stripHtmlTagAndBlankspace($tds[1]) : '',
+                'profession' => strlen($tds[2]) ? $this->stripHtmlTagAndBlankspace($tds[2]) : '',
+                'courseCode' => strlen($tds[3]) ? $this->stripHtmlTagAndBlankspace($tds[3]) : '',
+                'courseName' => strlen($tds[4]) ? $this->stripHtmlTagAndBlankspace($tds[4]) : '',
+                'totalHours' => strlen($tds[5]) ? $this->stripHtmlTagAndBlankspace($tds[5]) : '',
+                'credit' => strlen($tds[6]) ? $this->stripHtmlTagAndBlankspace($tds[6]) : '',
+                'accessMethod' => strlen($tds[7]) ? $this->stripHtmlTagAndBlankspace($tds[7]) : '',
+                'department' => strlen($tds[8]) ? $this->stripHtmlTagAndBlankspace($tds[8]) : '',
+                'referenceWeeklyHours' => strlen($tds[9]) ? $this->stripBlankspace($tds[9]) : '',
             ];
         }
 
@@ -320,5 +304,4 @@ class TrainingPlan extends Base
             ]
         ];
     }
-
 }

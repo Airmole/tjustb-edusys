@@ -21,6 +21,7 @@ class Login extends Base
 
     /**
      * 初始化
+     * @param string $mode 登录模式
      * @throws Exception
      */
     public function __construct(string $mode = 'new')
@@ -174,7 +175,7 @@ class Login extends Base
             if ($response['code'] != 302) throw new Exception('new login系统异常,请联系开发者');
             $redirectResponse = $this->httpGetFollowLocation($this->edusysUrl, $this->loginedLocationUrl($response['data']), $cookie);
             $url = $this->isStudent($usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp';
-            $mainBoard = $this->httpGet($url, $redirectResponse['cookie'], $this->edusysUrl. '/');
+            $mainBoard = $this->httpGet($url, $redirectResponse['cookie'], $this->edusysUrl . '/');
             $cookie = $redirectResponse['cookie'];
         } elseif ($this->mode == 'sso') {
             $ssoAuth = new SsoLogin();
@@ -190,7 +191,7 @@ class Login extends Base
             if ($validateResult !== true) return $validateResult;
             if ($response['code'] != 302) throw new Exception('login系统异常,请联系开发者');
             $url = $this->isStudent($usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp';
-            $mainBoard = $this->httpGet($url, $cookie, $this->edusysUrl. '/jsxsd/');
+            $mainBoard = $this->httpGet($url, $cookie, $this->edusysUrl . '/jsxsd/');
         }
 
         if ($mainBoard['code'] != 200) throw new Exception('访问主界面异常失败');
@@ -211,7 +212,7 @@ class Login extends Base
         if (strpos($response['data'], '用户名或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '该帐号不存在或密码错误')) return ['code' => 403, 'data' => '用户名或密码错误'];
         if (strpos($response['data'], '该帐号已锁定')) return ['code' => 403, 'data' => '错误次数过多账号锁定，请半小时后再试'];
-        return  true;
+        return true;
     }
 
     /**
@@ -257,9 +258,10 @@ class Login extends Base
      * @param string $sess
      * @param string $usercode
      * @param string $password
-     * @return void
+     * @return string
      */
-    public function signLoginFormValue(string $sess, string $usercode, string $password): string {
+    public function signLoginFormValue(string $sess, string $usercode, string $password): string
+    {
         list($scode, $sxh) = explode("#", $sess);
         $code = $usercode . "%%%" . $password;
         $encoded = "";
@@ -282,7 +284,8 @@ class Login extends Base
      * @param string $response
      * @return string
      */
-    public function loginedLocationUrl(string $response) : string {
+    public function loginedLocationUrl(string $response): string
+    {
         preg_match('/Location: (.*)?/', $response, $resultUrl);
         return $this->stripBlankspace($resultUrl[1]);
     }
@@ -319,7 +322,7 @@ class Login extends Base
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch,CURLINFO_HTTP_CODE);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         return ['code' => $httpCode, 'data' => $response];
     }
@@ -358,7 +361,7 @@ class Login extends Base
         ));
 
         $response = curl_exec($curl);
-        $httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
         preg_match('/Set-Cookie: JSESSIONID=(.*); Path=\/jsxsd;/i', $response, $newCookie);
@@ -366,5 +369,4 @@ class Login extends Base
 
         return ['code' => $httpCode, 'data' => $response, 'cookie' => "JSESSIONID={$newCookie}; {$cookie}"];
     }
-
 }

@@ -7,21 +7,8 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 成绩查询
  */
-class Score extends Base
+class Score extends AbstractService
 {
-    /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
     /**
      * 获取成绩
      * @param string $time 开课学期
@@ -43,8 +30,7 @@ class Score extends Base
         $referer = $this->edusysUrl . '/jsxsd/kscj/cjcx_query';
         $post = "kksj={$time}&kcxz={$nature}&kcmc={$course}&xsfs={$show}";
         $score = $this->httpPost('/jsxsd/kscj/cjcx_list', $post, $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($score['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($score['data']);
         if ($score['code'] !== self::CODE_SUCCESS) throw new Exception('获取成绩失败');
         $summary = $this->formatScoreSummary($score['data']);
         $score = $this->formatScoreList($score['data']);
@@ -127,27 +113,19 @@ class Score extends Base
         }
 
         // 语义化array结构
+        $fieldMap = [
+            'SerialNo', 'courseSemester', 'courseCode', 'courseName', 'groupName',
+            'score', 'scoreMark', 'credit', 'period', 'scorePoint',
+            'refixTream', 'accessMethod', 'examNature', 'courseType', 'courseNature', 'courseCategory'
+        ];
         foreach ($data as $row => $cells) {
             foreach ($cells as $index => $cell) {
                 $data[$row][$index] = $this->stripHtmlTagAndBlankspace($cell);
             }
             $rowData = $data[$row];
-            $score[$row]["SerialNo"] = $rowData[0];
-            $score[$row]["courseSemester"] = $rowData[1];
-            $score[$row]["courseCode"] = $rowData[2];
-            $score[$row]["courseName"] = $rowData[3];
-            $score[$row]["groupName"] = $rowData[4];
-            $score[$row]["score"] = $rowData[5];
-            $score[$row]["scoreMark"] = $rowData[6];
-            $score[$row]["credit"] = $rowData[7];
-            $score[$row]["period"] = $rowData[8];
-            $score[$row]["scorePoint"] = $rowData[9];
-            $score[$row]["refixTream"] = $rowData[10];
-            $score[$row]["accessMethod"] = $rowData[11];
-            $score[$row]["examNature"] = $rowData[12];
-            $score[$row]["courseType"] = $rowData[13];
-            $score[$row]["courseNature"] = $rowData[14];
-            $score[$row]["courseCategory"] = $rowData[15];
+            foreach ($fieldMap as $fieldIndex => $fieldName) {
+                $score[$row][$fieldName] = $rowData[$fieldIndex] ?? '';
+            }
         }
 
         return $score;
@@ -168,7 +146,7 @@ class Score extends Base
         $score = array_reverse($score);
 
         // 所有学期
-        $semesters = []; // 学期
+        $semesters = [];
         foreach ($score as $item) {
             if (in_array($item['courseSemester'], $semesters)) continue;
             $semesters[] = $item['courseSemester'];
@@ -192,11 +170,11 @@ class Score extends Base
                 $courseScore = $semesterScore[$semester]["items"][$key]['score'];
                 // 60分以上计入计算加权平均分
                 if (is_numeric($courseScore) && (int)$courseScore >= 60) {
-                    $semesterSumVaild = $semesterSumVaild + 1;
-                    $semesterScoreTotal = $semesterScoreTotal + (int)$courseScore;
+                    $semesterSumVaild++;
+                    $semesterScoreTotal += (int)$courseScore;
                     $credit = is_numeric($value['credit']) ? $value['credit'] : sprintf("%01.2f", (float)$value['credit']);
-                    $semesterScoreCreditSum = $semesterScoreCreditSum + ((int)$courseScore * $credit);
-                    $semesterSumCredit = $semesterSumCredit + $value['credit'];
+                    $semesterScoreCreditSum += ((int)$courseScore * $credit);
+                    $semesterSumCredit += $value['credit'];
                 }
             }
             $semesterScore[$semester]["total"] = $semesterScoreTotal;
@@ -217,15 +195,14 @@ class Score extends Base
 
     /**
      * 获取成绩查询筛选菜单列表
-     * @return array[]
+     * @return array
      * @throws Exception
      */
     public function scoreQueryOptions(): array
     {
         $referer = $this->edusysUrl . '/jsxsd/kscj/cjcx_frm';
         $html = $this->httpGet('/jsxsd/kscj/cjcx_query', $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatScoreQueryOptions($html['data']);
     }
@@ -233,7 +210,7 @@ class Score extends Base
     /**
      * 匹配成绩查询筛选下拉选项菜单
      * @param string $html
-     * @return array[]
+     * @return array
      * @throws Exception
      */
     public function formatScoreQueryOptions(string $html): array
@@ -283,5 +260,4 @@ class Score extends Base
             'show'   => $showOptions
         ];
     }
-
 }

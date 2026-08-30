@@ -7,20 +7,12 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 教师账号相关功能
  */
-class Teacher extends Base
+class Teacher extends AbstractService
 {
     /**
-     * 初始化
-     * @throws Exception
+     * @var string 账号参数校验失败时的错误消息
      */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('账号参数不得为空');
-    }
+    protected string $usercodeEmptyMessage = '账号参数不得为空';
 
     /**
      * 查询我的课程列表
@@ -32,8 +24,7 @@ class Teacher extends Base
         $url = '/jsxsd/framework/jsMain_new.jsp?t1=1';
         $referer = $this->edusysUrl . '/jsxsd/framework/jsMain.jsp';
         $html = $this->httpGet($url, $this->cookie, $referer);
-        $validHtml = $this->checkCookieByHtml($html['data']);
-        if ($validHtml !== true) throw new Exception($validHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatCourseList($html['data']);
     }
@@ -81,8 +72,7 @@ class Teacher extends Base
         $url = "/jsxsd/framework/jsMain_hmc.jsp?jx0404id={$queryCode}";
 
         $html = $this->httpGet($url, $this->cookie, $referer);
-        $validHtml = $this->checkCookieByHtml($html['data']);
-        if ($validHtml !== true) throw new Exception($validHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatStudentList($html['data']);
     }
@@ -94,26 +84,24 @@ class Teacher extends Base
      */
     public function formatStudentList(string $html): array
     {
-        preg_match_all('/<tr>(.*?)<\/tr>/s',$html,$rows);
+        preg_match_all('/<tr>(.*?)<\/tr>/s', $html, $rows);
         $rows = $rows ? $rows[0] : [];
+
+        $fieldMap = ['no', 'major', 'profession', 'grade', 'className', 'usercode', 'name', 'gender'];
 
         $studentList = [];
         foreach ($rows as $index => $row) {
             if ($index == 0) continue;
-            $tempArray = explode("</td>",$row);
-            $studentList[] = [
-                'no' => $this->stripHtmlTagAndBlankspace($tempArray[0]),
-                'major' => $this->stripHtmlTagAndBlankspace($tempArray[1]),
-                'profession' => $this->stripHtmlTagAndBlankspace($tempArray[2]),
-                'grade' => $this->stripHtmlTagAndBlankspace($tempArray[3]),
-                'className' => $this->stripHtmlTagAndBlankspace($tempArray[4]),
-                'usercode' => $this->stripHtmlTagAndBlankspace($tempArray[5]),
-                'name' => $this->stripHtmlTagAndBlankspace($tempArray[6]),
-                'gender' => $this->stripHtmlTagAndBlankspace($tempArray[7]),
-            ];
+            $tempArray = explode("</td>", $row);
+            $student = [];
+            foreach ($fieldMap as $fieldIndex => $fieldName) {
+                $student[$fieldName] = isset($tempArray[$fieldIndex])
+                    ? $this->stripHtmlTagAndBlankspace($tempArray[$fieldIndex])
+                    : '';
+            }
+            $studentList[] = $student;
         }
 
         return $studentList;
     }
-
 }

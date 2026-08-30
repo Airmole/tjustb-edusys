@@ -7,21 +7,8 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 班级课表查询
  */
-class ClassCourseTable extends Base
+class ClassCourseTable extends AbstractService
 {
-    /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
     /**
      * 查询选项列表
      * @return array
@@ -31,8 +18,7 @@ class ClassCourseTable extends Base
     {
         $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp');
         $html = $this->httpGet('/jsxsd/kbcx/kbxx_xzb', $this->cookie, $referer, 50);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatOptions($html['data']);
     }
@@ -79,7 +65,7 @@ class ClassCourseTable extends Base
     public function getProfessionsByCollege(string $collegeCode = '', string $grade = ''): array
     {
         $data = [];
-        $query = "&skyx={$collegeCode}&sknj={$grade}";  // 这里不是错误，教务就是这么写的。。。无语了
+        $query = "&skyx={$collegeCode}&sknj={$grade}";  // 教务系统的参数名就叫这个
         $url = '/jsxsd/kbcx/getZyByAjax?' . $query;
         $referer = $this->edusysUrl . '/jsxsd/kbcx/kbxx_xzb';
         $jsonStr = $this->httpGet($url, $this->cookie, $referer);
@@ -89,6 +75,7 @@ class ClassCourseTable extends Base
     }
 
     /**
+     * 班级课表查询
      * @param string $semester 学年学期 2022-2023-1
      * @param string $timeModel 时间模式
      * @param string $college 院系
@@ -99,8 +86,6 @@ class ClassCourseTable extends Base
      * @param string $weekEnd 结束周（值1~30）
      * @param string $dayOfWeekStart 开始星期几（值1~7）
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
-     * @param string $serialNoStart 开始节数（暂不生效）
-     * @param string $serialNoEnd 结束节数（暂不生效）
      * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
@@ -133,14 +118,11 @@ class ClassCourseTable extends Base
             'zc2'      => $weekEnd,
             'skxq1'    => $dayOfWeekStart,
             'skxq2'    => $dayOfWeekEnd,
-            // 'jc1'      => $serialNoStart,
-            // 'jc2'      => $serialNoEnd
         ];
         $post = http_build_query($postPara);
         $referer = $this->edusysUrl . '/jsxsd/kbcx/kbxx_xzb';
         $html = $this->httpPost('/jsxsd/kbcx/kbxx_xzb_ifr', $post, $this->cookie, $referer, $timeout);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         $html = $this->stripBlankspace($html['data']);
         return $this->formatClassCourseTables($html);
@@ -240,5 +222,4 @@ class ClassCourseTable extends Base
 
         return $course;
     }
-
 }

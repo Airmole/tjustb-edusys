@@ -7,21 +7,8 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 教室相关
  */
-class Classroom extends Base
+class Classroom extends AbstractService
 {
-    /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
     /**
      * 教室借用情况筛选项
      * @return array
@@ -31,8 +18,7 @@ class Classroom extends Base
     {
         $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp');
         $html = $this->httpGet('/jsxsd/kbxx/jsjy_query', $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatOptions($html['data']);
     }
@@ -66,11 +52,6 @@ class Classroom extends Base
         preg_match('/教室类型.*?教学楼/s', $html, $classroomTypeHtml);
         $classroomTypeHtml = $classroomTypeHtml ? $classroomTypeHtml[0] : '';
         $classroomTypeOptions = $this->formatOption($classroomTypeHtml, '', '/<option value="(.*)?"/');
-
-        // 教学楼
-        // $building = $this->classroomList('building');
-        // 教室
-        // $classroom = $this->classroomList('classroom');
 
         // 容纳人数比较符号
         preg_match('/人数.*?教室状态/s', $html, $peopleSignHtml);
@@ -142,7 +123,7 @@ class Classroom extends Base
      * @param string $serialNoStart 开始节数
      * @param string $serialNoEnd 结束节数
      * @param string $classroomOwned 教室所属单位
-     * @return array[]
+     * @return array
      * @throws Exception
      */
     public function classroom(
@@ -193,8 +174,7 @@ class Classroom extends Base
         $post = http_build_query($postPara);
         $referer = $this->edusysUrl . '/jsxsd/kbxx/jsjy_query';
         $html = $this->httpPost('/jsxsd/kbxx/jsjy_query2', $post, $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatClassroom($html['data']);
     }
@@ -202,7 +182,7 @@ class Classroom extends Base
     /**
      * 格式化匹配解析教室占用状态及详情所需参数
      * @param string $html
-     * @return array[]
+     * @return array
      */
     public function formatClassroom(string $html): array
     {
@@ -291,21 +271,21 @@ class Classroom extends Base
      */
     public function classroomList(string $type = 'classroom', string $buildingId = ''): array
     {
-        $requestType = 'newjs';
-        if ($type === 'area') $requestType = 'jxq';         // 教学区列表
-        if ($type === 'building') $requestType = 'jxl';     // 教学楼列表
-        if ($type === 'classroom') $requestType = 'newjs';  // 教室列表
-        if ($type === 'type') $requestType = 'js';          // 教室类型?
+        $requestTypeMap = [
+            'area'      => 'jxq',    // 教学区列表
+            'building'  => 'jxl',    // 教学楼列表
+            'classroom' => 'newjs',  // 教室列表
+            'type'      => 'js',     // 教室类型
+        ];
+        $requestType = $requestTypeMap[$type] ?? 'newjs';
 
-
-        $queryData = [ 'xqid' => '', 'gnqid' => '', 'requestType' => $requestType ];
+        $queryData = ['xqid' => '', 'gnqid' => '', 'requestType' => $requestType];
         if (!empty($buildingId)) $queryData['jxlid'] = $buildingId;
         $uri = '/jsxsd/kbxx/jsjy_processAjax?' . http_build_query($queryData);
         $referer = $this->edusysUrl . '/jsxsd/kbxx/jsjy_query';
-        $json =  $this->httpGet($uri, $this->cookie, $referer);
+        $json = $this->httpGet($uri, $this->cookie, $referer);
 
-        $vaildJson = $this->checkCookieByHtml($json['data']);
-        if ($vaildJson !== true) throw new Exception($vaildJson['data']);
+        $this->validateHtml($json['data']);
         if ($json['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         $data = json_decode($json['data'], true);
 
@@ -332,22 +312,11 @@ class Classroom extends Base
         if ($serialIndex < 0 || $serialIndex > 5) return '';
 
         $dayOfWeekIndex = $dayOfWeekIndex + 1;
-        switch ($serialIndex) {
-            case 0:
-                return $dayOfWeekIndex . '0102';
-            case 1:
-                return $dayOfWeekIndex . '0304';
-            case 2:
-                return $dayOfWeekIndex . '0506';
-            case 3:
-                return $dayOfWeekIndex . '0708';
-            case 4:
-                return $dayOfWeekIndex . '0910';
-            case 5:
-                return $dayOfWeekIndex . '111213';
-            default:
-                return '';
-        }
+        $serialMap = [
+            0 => '0102', 1 => '0304', 2 => '0506',
+            3 => '0708', 4 => '0910', 5 => '111213',
+        ];
+        return $dayOfWeekIndex . ($serialMap[$serialIndex] ?? '');
     }
 
     /**
@@ -397,19 +366,18 @@ class Classroom extends Base
             'endJc' => $serialNoEnd,
             'startXq' => $dayOfWeekStart,
             'endXq' => $dayOfWeekEnd,
-            'jszt' => $classroomStatus, // 教室状态参数？
+            'jszt' => $classroomStatus,
             'type' => 'add',
             'kbjcmsid' => $timeModel,
             'xq' => $dayOfWeek,
             'kssj' => $startAt,
             'jssj' => $endAt,
-            'tktime' => time() . '000', // 13位时间戳
+            'tktime' => time() . '000',
         ];
         $uri = '/jsxsd/kbxx/jsjy_jszyqk?' . http_build_query($postData);
         $referer = $this->edusysUrl . '/jsxsd/kbxx/jsjy_query2';
         $html = $this->httpGet($uri, $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatClassroomDetail($html['data']);
     }
@@ -441,5 +409,4 @@ class Classroom extends Base
 
         return $data;
     }
-
 }

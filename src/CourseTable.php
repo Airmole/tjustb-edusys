@@ -7,24 +7,11 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 课表
  */
-class CourseTable extends Base
+class CourseTable extends AbstractService
 {
     /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
-    /**
      * 课表查询选项列表
-     * @return array[]
+     * @return array
      * @throws Exception
      */
     public function myCourseQueryOptions(): array
@@ -32,8 +19,7 @@ class CourseTable extends Base
         $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp');
         $url = $this->isStudent($this->usercode) ? '/jsxsd/xskb/xskb_list.do' : '/jsxsd/jskb/jskb_list.do';
         $html = $this->httpGet($url, $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatMyCourseQueryOptions($html['data']);
     }
@@ -41,7 +27,7 @@ class CourseTable extends Base
     /**
      * 解析匹配课表查询选项列表
      * @param string $html
-     * @return array[]
+     * @return array
      * @throws Exception
      */
     public function formatMyCourseQueryOptions(string $html): array
@@ -96,10 +82,9 @@ class CourseTable extends Base
             $referer = $this->edusysUrl . '/jsxsd/jskb/jskb_list.do';
             $html = $this->httpPost('/jsxsd/jskb/jskb_list.do', $post, $this->cookie, $referer);
         }
-        $validHtml = $this->checkCookieByHtml($html['data']);
-        if ($validHtml !== true) throw new Exception($validHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
-        return $this->formatMyCourse($html['data'], $this->isTeacher($this->usercode));
+        return $this->formatMyCourse($html['data']);
     }
 
     /**
@@ -338,8 +323,7 @@ class CourseTable extends Base
         $post = "rq={$date}";
         $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain_new.jsp?t1=1' : '/jsxsd/framework/jsMain_new.jsp?t1=1');
         $html = $this->httpPost('/jsxsd/framework/main_index_loadkb.jsp', $post, $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return array_merge(
             $this->formatDateCourse($html['data']),
@@ -348,6 +332,7 @@ class CourseTable extends Base
     }
 
     /**
+     * 解析格式化日期个人课表
      * @param string $html
      * @return array
      */
@@ -495,5 +480,4 @@ class CourseTable extends Base
 
         return $course;
     }
-
 }

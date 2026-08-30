@@ -4,32 +4,21 @@ namespace Airmole\TjustbEdusys;
 
 use Airmole\TjustbEdusys\Exception\Exception;
 
-class Calendar extends Base
+/**
+ * 校历相关
+ */
+class Calendar extends AbstractService
 {
     /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
-    /**
      * 校历筛选项
-     * @return array[]
+     * @return array
      * @throws Exception
      */
-    public function calencarOptions(): array
+    public function calendarOptions(): array
     {
         $referer = $this->edusysUrl . '/jsxsd/framework/xsMain.jsp';
         $html = $this->httpGet('/jsxsd/jxzl/jxzl_query', $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatCalendarOptions($html['data']);
     }
@@ -37,7 +26,7 @@ class Calendar extends Base
     /**
      * 解析匹配校历学期选项列表
      * @param string $html
-     * @return array[]
+     * @return array
      * @throws Exception
      */
     public function formatCalendarOptions(string $html): array
@@ -75,8 +64,7 @@ class Calendar extends Base
             $html = $this->httpGet($url, $this->cookie, $referer);
         }
 
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
 
         return $this->formatCalendar($html['data']);
@@ -131,5 +119,4 @@ class Calendar extends Base
             'tips'     => $tips
         ];
     }
-
 }
