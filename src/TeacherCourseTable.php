@@ -7,21 +7,8 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 教师课表查询
  */
-class TeacherCourseTable extends Base
+class TeacherCourseTable extends AbstractService
 {
-    /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
     /**
      * 查询选项列表
      * @return array
@@ -31,8 +18,7 @@ class TeacherCourseTable extends Base
     {
         $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp');
         $html = $this->httpGet('/jsxsd/kbcx/kbxx_teacher', $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatOptions($html['data']);
     }
@@ -115,8 +101,7 @@ class TeacherCourseTable extends Base
         $referer = $this->edusysUrl . '/jsxsd/kbcx/kbxx_teacher';
 
         $html = $this->httpPost('/jsxsd/kbcx/kbxx_teacher_ifr', $post, $this->cookie, $referer, $timeout);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         $html = $this->stripBlankspace($html['data']);
         return $this->formatTeacherCourseTables($html);
@@ -211,5 +196,4 @@ class TeacherCourseTable extends Base
 
         return $course;
     }
-
 }

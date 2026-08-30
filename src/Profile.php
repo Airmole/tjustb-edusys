@@ -7,19 +7,8 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 资料、学籍信息相关
  */
-class Profile extends Base
+class Profile extends AbstractService
 {
-    /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-    }
-
     /**
      * 获取账号个人信息
      * @return array
@@ -27,19 +16,15 @@ class Profile extends Base
      */
     public function getProfile(): array
     {
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
         $referer = $this->edusysUrl . '/jsxsd/';
         if ($this->isStudent($this->usercode)) {
             $html = $this->httpGet('/jsxsd/grxx/xsxx', $this->cookie, $referer);
-            $vaildHtml = $this->checkCookieByHtml($html['data']);
-            if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+            $this->validateHtml($html['data']);
             $html['data'] = $this->formatStudentProfile($html['data']);
             return $html;
         } else {
             $html = $this->httpGet('/jsxsd/jsxx/queryjsxxjb', $this->cookie, $referer);
-            $vaildHtml = $this->checkCookieByHtml($html['data']);
-            if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+            $this->validateHtml($html['data']);
             $html['data'] = $this->formatTeacherProfile($html['data']);
             return $html;
         }
@@ -242,5 +227,4 @@ class Profile extends Base
 
         return $profile;
     }
-
 }

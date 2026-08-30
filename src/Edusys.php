@@ -30,6 +30,15 @@ class Edusys
     }
 
     /**
+     * 检查是否已登录
+     * @throws Exception
+     */
+    protected function checkLogin(): void
+    {
+        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+    }
+
+    /**
      * 获取登录所需参数
      * @return array
      * @throws Exception
@@ -118,7 +127,7 @@ class Edusys
      */
     public function changePassword(string $nowPwd, string $newPwd, string $repeatNewpwd): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $login = new Login();
         $result = $login->changePassword($this->cookie, $nowPwd, $newPwd, $repeatNewpwd);
         if ($result['code'] !== Base::CODE_SUCCESS) throw new Exception($result['data']);
@@ -132,7 +141,7 @@ class Edusys
      */
     public function profile(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $profile = new Profile($this->usercode, $this->cookie);
         $profile = $profile->getProfile();
         if ($profile['code'] !== Base::CODE_SUCCESS) throw new Exception('获取失败');
@@ -146,7 +155,7 @@ class Edusys
      */
     public function photo(): string
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $profile = new Profile($this->usercode, $this->cookie);
         return $profile->photo();
     }
@@ -158,7 +167,7 @@ class Edusys
      */
     public function scoreQueryOptions(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $score = new Score($this->usercode, $this->cookie);
         return $score->scoreQueryOptions();
     }
@@ -181,7 +190,7 @@ class Edusys
         bool   $classify = true
     ): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $score = new Score($this->usercode, $this->cookie);
         return $score->score($time, $nature, $course, $show, $classify);
     }
@@ -195,7 +204,7 @@ class Edusys
      */
     public function semesterCourseTable(string $week = '', string $semester = ''): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $course = new CourseTable($this->usercode, $this->cookie);
         return $course->semesterCourse($week, $semester);
     }
@@ -207,7 +216,7 @@ class Edusys
      */
     public function courseTableOptions(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $course = new CourseTable($this->usercode, $this->cookie);
         return $course->myCourseQueryOptions();
     }
@@ -220,7 +229,7 @@ class Edusys
      */
     public function dateCourseTable(string $date = ''): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $course = new CourseTable($this->usercode, $this->cookie);
         return $course->dateCourse($date);
     }
@@ -232,9 +241,9 @@ class Edusys
      */
     public function calendarOptions(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $calendar = new Calendar($this->usercode, $this->cookie);
-        return $calendar->calencarOptions();
+        return $calendar->calendarOptions();
     }
 
     /**
@@ -245,7 +254,7 @@ class Edusys
      */
     public function calendar(string $semester = ''): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $calendar = new Calendar($this->usercode, $this->cookie);
         return $calendar->calendar($semester);
     }
@@ -257,7 +266,7 @@ class Edusys
      */
     public function classCourseOptions(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $classCourse = new ClassCourseTable($this->usercode, $this->cookie);
         return $classCourse->options();
     }
@@ -271,7 +280,7 @@ class Edusys
      */
     public function getProfessions(string $collegeCode = '', string $grade = ''): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $classCourse = new ClassCourseTable($this->usercode, $this->cookie);
         return $classCourse->getProfessionsByCollege($collegeCode, $grade);
     }
@@ -288,8 +297,6 @@ class Edusys
      * @param string $weekEnd 结束周（值1~30）
      * @param string $dayOfWeekStart 开始星期几（值1~7）
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
-     * @param string $serialNoStart 开始节数
-     * @param string $serialNoEnd 结束节数
      * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
@@ -310,22 +317,12 @@ class Edusys
         int $timeout = 30
     ): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $classCourse = new ClassCourseTable($this->usercode, $this->cookie);
         return $classCourse->classCourse(
-            $semester,
-            $timeModel,
-            $college,
-            $grade,
-            $profession,
-            $className,
-            $weekStart,
-            $weekEnd,
-            $dayOfWeekStart,
-            $dayOfWeekEnd,
-            $serialNoStart,
-            $serialNoEnd,
-            $timeout
+            $semester, $timeModel, $college, $grade, $profession, $className,
+            $weekStart, $weekEnd, $dayOfWeekStart, $dayOfWeekEnd,
+            $serialNoStart, $serialNoEnd, $timeout
         );
     }
 
@@ -336,7 +333,7 @@ class Edusys
      */
     public function teacherCourseOptions(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $teacherCourse = new TeacherCourseTable($this->usercode, $this->cookie);
         return $teacherCourse->options();
     }
@@ -352,8 +349,6 @@ class Edusys
      * @param string $weekEnd 结束周（值1~30）
      * @param string $dayOfWeekStart 开始星期几（值1~7）
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
-     * @param string $serialNoStart 开始节数
-     * @param string $serialNoEnd 结束节数
      * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
@@ -373,21 +368,12 @@ class Edusys
         int $timeout = 30
     ): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $teacherCourse = new TeacherCourseTable($this->usercode, $this->cookie);
         return $teacherCourse->teacherCourse(
-            $semester,
-            $timeModel,
-            $college,
-            $teacherLevel,
-            $teacherName,
-            $weekStart,
-            $weekEnd,
-            $dayOfWeekStart,
-            $dayOfWeekEnd,
-            $serialNoStart,
-            $serialNoEnd,
-            $timeout
+            $semester, $timeModel, $college, $teacherLevel, $teacherName,
+            $weekStart, $weekEnd, $dayOfWeekStart, $dayOfWeekEnd,
+            $serialNoStart, $serialNoEnd, $timeout
         );
     }
 
@@ -398,7 +384,7 @@ class Edusys
      */
     public function lessonCourseOptions(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $lessonCourse = new LessonCourseTable($this->usercode, $this->cookie);
         return $lessonCourse->options();
     }
@@ -415,9 +401,7 @@ class Edusys
      * @param string $weekEnd 结束周（值1~30）
      * @param string $dayOfWeekStart 开始星期几（值1~7）
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
-     * @param string $serialNoStart 开始节数
-     * @param string $serialNoEnd 结束节数
-     * @param int $timeout
+     * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
      */
@@ -437,22 +421,12 @@ class Edusys
         int $timeout = 30
     ): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $lessonCourse = new LessonCourseTable($this->usercode, $this->cookie);
         return $lessonCourse->lessonCourse(
-            $semester,
-            $timeModel,
-            $studyCollege,
-            $teachCollege,
-            $courseNature,
-            $courseName,
-            $weekStart,
-            $weekEnd,
-            $dayOfWeekStart,
-            $dayOfWeekEnd,
-            $serialNoStart,
-            $serialNoEnd,
-            $timeout
+            $semester, $timeModel, $studyCollege, $teachCollege, $courseNature, $courseName,
+            $weekStart, $weekEnd, $dayOfWeekStart, $dayOfWeekEnd,
+            $serialNoStart, $serialNoEnd, $timeout
         );
     }
 
@@ -463,7 +437,7 @@ class Edusys
      */
     public function classroomStatusOptions(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $classroom = new Classroom($this->usercode, $this->cookie);
         return $classroom->options();
     }
@@ -488,7 +462,7 @@ class Edusys
      * @param string $serialNoStart 开始节数
      * @param string $serialNoEnd 结束节数
      * @param string $classroomOwned 教室所属单位
-     * @return array[]
+     * @return array
      * @throws Exception
      */
     public function classroomStatus(
@@ -512,27 +486,13 @@ class Edusys
         string $classroomOwned = ''
     ): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $classroom = new Classroom($this->usercode, $this->cookie);
         return $classroom->classroom(
-            $semester,
-            $timeModel,
-            $schoolArea,
-            $teachArea,
-            $classroomType,
-            $teachBuilding,
-            $classroomCode,
-            $peopleSign,
-            $peopleNum,
-            $classroomStatus,
-            $borrowCollege,
-            $weekStart,
-            $weekEnd,
-            $dayOfWeekStart,
-            $dayOfWeekEnd,
-            $serialNoStart,
-            $serialNoEnd,
-            $classroomOwned
+            $semester, $timeModel, $schoolArea, $teachArea, $classroomType,
+            $teachBuilding, $classroomCode, $peopleSign, $peopleNum, $classroomStatus,
+            $borrowCollege, $weekStart, $weekEnd, $dayOfWeekStart, $dayOfWeekEnd,
+            $serialNoStart, $serialNoEnd, $classroomOwned
         );
     }
 
@@ -545,7 +505,7 @@ class Edusys
      */
     public function classroomList(string $type = 'classroom', string $buildingId = ''): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $classroom = new Classroom($this->usercode, $this->cookie);
         return $classroom->classroomList($type, $buildingId);
     }
@@ -586,33 +546,23 @@ class Edusys
         string $classroomStatus = ''
     ): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $classroom = new Classroom($this->usercode, $this->cookie);
         return $classroom->classroomDetail(
-            $semester,
-            $timeModel,
-            $classroomCode,
-            $serialValue,
-            $dayOfWeek,
-            $startAt,
-            $endAt,
-            $dayOfWeekStart,
-            $dayOfWeekEnd,
-            $weekStart,
-            $weekEnd,
-            $serialNoStart,
-            $serialNoEnd,
-            $classroomStatus
+            $semester, $timeModel, $classroomCode, $serialValue, $dayOfWeek,
+            $startAt, $endAt, $dayOfWeekStart, $dayOfWeekEnd, $weekStart,
+            $weekEnd, $serialNoStart, $serialNoEnd, $classroomStatus
         );
     }
 
     /**
      * 教师查询授课列表
+     * @return array
      * @throws Exception
      */
     public function teacherCourseList(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $teacher = new Teacher($this->usercode, $this->cookie);
         return $teacher->courseList();
     }
@@ -625,7 +575,7 @@ class Edusys
      */
     public function teacherQueryStudentList(string $queryCode): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $teacher = new Teacher($this->usercode, $this->cookie);
         return $teacher->queryStudentList($queryCode);
     }
@@ -637,7 +587,7 @@ class Edusys
      */
     public function trainingPlan(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $plan = new TrainingPlan($this->usercode, $this->cookie);
         return $plan->trainingPlan();
     }
@@ -652,7 +602,7 @@ class Edusys
      */
     public function trainingPlanOptions(string $college = '', string $grade = '', string $profession = ''): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $plan = new TrainingPlan($this->usercode, $this->cookie);
         return $plan->options($college, $grade, $profession);
     }
@@ -667,7 +617,7 @@ class Edusys
      */
     public function professionTrainingPlan(string $grade, string $profession, int $page = 1): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $plan = new TrainingPlan($this->usercode, $this->cookie);
         return $plan->professionTrainingPlan($grade, $profession, $page);
     }
@@ -679,7 +629,7 @@ class Edusys
      */
     public function needEvaluateSemester(): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $evaluate = new EvaluateTeacher($this->usercode, $this->cookie);
         return $evaluate->needEvaluateSemester();
     }
@@ -687,24 +637,26 @@ class Edusys
     /**
      * 获取评教课程列表
      * @param string $semesterUrl 评教学期批次页面URL
+     * @return array
      * @throws Exception
      */
     public function needEvaluateCourse(string $semesterUrl): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $evaluate = new EvaluateTeacher($this->usercode, $this->cookie);
         return $evaluate->needEvaluateCourse($semesterUrl);
     }
 
     /**
      * 获取评教课程详情
+     * @param string $courseUrl
+     * @return array
      * @throws Exception
      */
     public function evaluateCourseDetail(string $courseUrl): array
     {
-        if (empty($this->usercode) || empty($this->cookie)) throw new Exception('账号未登录');
+        $this->checkLogin();
         $evaluate = new EvaluateTeacher($this->usercode, $this->cookie);
         return $evaluate->evaluateCourseDetail($courseUrl);
     }
-
 }

@@ -4,6 +4,9 @@ namespace Airmole\TjustbEdusys;
 
 use Airmole\TjustbEdusys\Exception\Exception;
 
+/**
+ * SSO登录
+ */
 class SsoLogin extends Base
 {
     /**
@@ -20,7 +23,7 @@ class SsoLogin extends Base
     public function ssoLogin(string $ticket): array
     {
         $url = '/jsxsd/sso.jsp?ticket=' . $ticket;
-        $result = $this->httpRequest('GET', $url, '', '', [
+        $result = $this->httpRequest('GET', $url, '', '', '', [
             'Host: jw.tjustb.cn',
             'Connection: keep-alive',
             'Upgrade-Insecure-Requests: 1',
@@ -40,7 +43,7 @@ class SsoLogin extends Base
 
         // 访问 /jsxsd/sso.jsp;jsessionid=xxx
         $nextUrl = $this->getLocationFromRedirectHeader($result['data']);
-        $redirect = $this->httpRequest('GET', $nextUrl, '', $this->cookie, [
+        $redirect = $this->httpRequest('GET', $nextUrl, '', $this->cookie, '', [
             'Upgrade-Insecure-Requests: 1',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6'
@@ -51,19 +54,17 @@ class SsoLogin extends Base
 
         // 访问 /jsxsd/framework/xsMain.jsp
         $nextUrl = $this->getLocationFromRedirectHeader($redirect['data']);
-        $redirect = $this->httpRequest('GET', $nextUrl, '', $this->cookie, [
+        $redirect = $this->httpRequest('GET', $nextUrl, '', $this->cookie, '', [
             'Upgrade-Insecure-Requests: 1',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6'
         ], true);
-//        var_dump($redirect);die;
         if ($redirect['code'] != 200) throw new Exception('登录失败2' . json_encode($redirect));
-        $xsMainNew = $this->httpRequest('GET', '/jsxsd/framework/xsMain_new.jsp?t1=1', '', $this->cookie, [
+        $xsMainNew = $this->httpRequest('GET', '/jsxsd/framework/xsMain_new.jsp?t1=1', '', $this->cookie, '', [
             'Upgrade-Insecure-Requests: 1',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             "Referer: {$this->edusysUrl}/jsxsd/framework/xsMain.jsp"
         ]);
-//        var_dump($xsMainNew);die;
         if ($xsMainNew['code'] != 200) throw new Exception('登录失败3' . json_encode($xsMainNew));
         return ['code' => 200, 'cookie' => $this->cookie, 'data' => $redirect['data']];
     }
@@ -75,7 +76,7 @@ class SsoLogin extends Base
      */
     public function getLoginPara(): array
     {
-        $url = $this->ssoDomain . '/authserver/login?service=' . urlencode($this->edusysUrl. '/jsxsd/sso.jsp');
+        $url = $this->ssoDomain . '/authserver/login?service=' . urlencode($this->edusysUrl . '/jsxsd/sso.jsp');
         $result = $this->httpGet($url, '', '', 5, true);
         $httpCode = $result['code'];
         $response = $result['data'];
@@ -119,10 +120,8 @@ class SsoLogin extends Base
     {
         if (empty($salt)) throw new Exception('密码salt值不可为空');
         if (empty($execution)) throw new Exception('execution值不可为空');
-        // TODO 后续优化支持自动识别滑动验证码
-        // if ($this->checkNeedCaptcha($usercode, $cookie)) throw new Exception('需要识别验证码');
 
-        $url = $this->ssoDomain . '/authserver/login?service=' . urlencode($this->edusysUrl. '/jsxsd/sso.jsp');
+        $url = $this->ssoDomain . '/authserver/login?service=' . urlencode($this->edusysUrl . '/jsxsd/sso.jsp');
         $postData = [
             'username' => $usercode,
             'password' => $this->encryptPassword($password, $salt),
@@ -160,7 +159,7 @@ class SsoLogin extends Base
         if (strpos($response['data'], '登录凭证不可用')) return ['code' => 403, 'data' => '登录凭证不可用'];
         if (strpos($response['data'], '图形动态码错误')) return ['code' => 403, 'data' => '失败次数过多，请手动登录教务网后再试'];
         if ($response['code'] == 502) return ['code' => 502, 'data' => '学校系统不稳定，请稍后再试'];
-        return  true;
+        return true;
     }
 
     /**
@@ -225,7 +224,7 @@ class SsoLogin extends Base
      * @param string $aesKey
      * @return string
      */
-    function encryptPassword(string $data, string $aesKey): string
+    public function encryptPassword(string $data, string $aesKey): string
     {
         if (!$aesKey) return $data;
         $aesKey = trim($aesKey);
@@ -241,7 +240,7 @@ class SsoLogin extends Base
      * @param string $aesKey
      * @return string
      */
-    function decryptPassword(string $data, string $aesKey): string
+    public function decryptPassword(string $data, string $aesKey): string
     {
         $iv = $this->randomString(16);
         $decrypted = openssl_decrypt(base64_decode($data), 'AES-128-CBC', $aesKey, OPENSSL_RAW_DATA, $iv);
@@ -253,7 +252,7 @@ class SsoLogin extends Base
      * @param int $length
      * @return string
      */
-    function randomString(int $length): string
+    public function randomString(int $length): string
     {
         $characters = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
         $charactersLength = strlen($characters);
@@ -263,5 +262,4 @@ class SsoLogin extends Base
         }
         return $randomString;
     }
-
 }

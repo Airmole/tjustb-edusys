@@ -7,21 +7,8 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 课程课表查询
  */
-class LessonCourseTable extends Base
+class LessonCourseTable extends AbstractService
 {
-    /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
     /**
      * 查询选项列表
      * @return array
@@ -31,8 +18,7 @@ class LessonCourseTable extends Base
     {
         $referer = $this->edusysUrl . ($this->isStudent($this->usercode) ? '/jsxsd/framework/xsMain.jsp' : '/jsxsd/framework/jsMain.jsp');
         $html = $this->httpGet('/jsxsd/kbcx/kbxx_kc', $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         return $this->formatOptions($html['data']);
     }
@@ -60,12 +46,12 @@ class LessonCourseTable extends Base
         $studyCollegeHtml = $studyCollegeHtml ? $studyCollegeHtml[0] : '';
         $studyCollegeOptions = $this->formatOption($studyCollegeHtml, '', '/<option value="(.*)?"/');
 
-        // 上课院系
+        // 开课院系
         preg_match('/开课院系.*?课程属性/s', $html, $teachCollegeHtml);
         $teachCollegeHtml = $teachCollegeHtml ? $teachCollegeHtml[0] : '';
         $teachCollegeOptions = $this->formatOption($teachCollegeHtml, '', '/<option value="(.*)?"/');
 
-        // 上课院系
+        // 课程属性
         preg_match('/课程属性.*?课程名称/s', $html, $courseNatureHtml);
         $courseNatureHtml = $courseNatureHtml ? $courseNatureHtml[0] : '';
         $courseNatureOptions = $this->formatOption($courseNatureHtml, '', '/<option value="(.*)?"/');
@@ -93,7 +79,7 @@ class LessonCourseTable extends Base
      * @param string $dayOfWeekEnd 结束星期几（值1~7）
      * @param string $serialNoStart 开始节数
      * @param string $serialNoEnd 结束节数
-     * @param int $timeout
+     * @param int $timeout 请求超时时间（秒）
      * @return array
      * @throws Exception
      */
@@ -131,8 +117,7 @@ class LessonCourseTable extends Base
         $post = http_build_query($postPara);
         $referer = $this->edusysUrl . '/jsxsd/kbcx/kbxx_kc';
         $html = $this->httpPost('/jsxsd/kbcx/kbxx_kc_ifr', $post, $this->cookie, $referer, $timeout);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取失败');
         $html = $this->stripBlankspace($html['data']);
         return $this->formatLessonCourseTables($html);
@@ -236,5 +221,4 @@ class LessonCourseTable extends Base
 
         return $course;
     }
-
 }

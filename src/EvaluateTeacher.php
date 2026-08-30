@@ -7,21 +7,8 @@ use Airmole\TjustbEdusys\Exception\Exception;
 /**
  * 学生评教
  */
-class EvaluateTeacher extends Base
+class EvaluateTeacher extends AbstractService
 {
-    /**
-     * 初始化
-     * @throws Exception
-     */
-    public function __construct(string $usercode = '', string $cookie = '')
-    {
-        parent::__construct();
-        $this->cookie = $cookie;
-        $this->usercode = $usercode;
-        if (empty($this->cookie)) throw new Exception('cookie不得为空');
-        if (empty($this->usercode)) throw new Exception('学号参数不得为空');
-    }
-
     /**
      * 获取需评教学期批次
      * @return array
@@ -32,8 +19,7 @@ class EvaluateTeacher extends Base
         if (!$this->isStudent($this->usercode)) throw new Exception('评教仅适用于学生用户');
         $referer = $this->edusysUrl . '/jsxsd/framework/xsMain.jsp';
         $html = $this->httpGet('/jsxsd/xspj/xspj_find.do', $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取评教学期批次失败');
         return $this->formatEvaluateSemester($html['data']);
     }
@@ -42,7 +28,7 @@ class EvaluateTeacher extends Base
      * 正则匹配需评教学期批次列表
      * @param string $html
      * @return array
-    */
+     */
     public function formatEvaluateSemester(string $html): array
     {
         preg_match('/value=\"(.*?)\" id=\"pageIndex\"/', $html, $currentPage);
@@ -96,6 +82,7 @@ class EvaluateTeacher extends Base
     /**
      * 获取评教课程列表
      * @param string $semesterUrl 评教学期批次页面URL
+     * @return array
      * @throws Exception
      */
     public function needEvaluateCourse(string $semesterUrl): array
@@ -103,8 +90,7 @@ class EvaluateTeacher extends Base
         if (empty($semesterUrl)) throw new Exception('评教学期URL入口有误');
         $referer = $this->edusysUrl . '/jsxsd/xspj/xspj_find.do';
         $html = $this->httpGet($semesterUrl, $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取评教课程列表失败');
         return $this->formatEvaluateCourseList($html['data']);
     }
@@ -113,7 +99,7 @@ class EvaluateTeacher extends Base
      * 正则匹配评教课程列表
      * @param string $html
      * @return array
-    */
+     */
     public function formatEvaluateCourseList(string $html): array
     {
         preg_match('/value=\"(.*?)\" id=\"pageIndex\"/', $html, $currentPage);
@@ -171,6 +157,7 @@ class EvaluateTeacher extends Base
     /**
      * 获取评教课程详情
      * @param string $courseUrl
+     * @return array
      * @throws Exception
      */
     public function evaluateCourseDetail(string $courseUrl): array
@@ -178,8 +165,7 @@ class EvaluateTeacher extends Base
         if (empty($courseUrl)) throw new Exception('评教课程URL入口有误');
         $referer = $this->edusysUrl . '/jsxsd/xspj/xspj_list.do';
         $html = $this->httpGet($courseUrl, $this->cookie, $referer);
-        $vaildHtml = $this->checkCookieByHtml($html['data']);
-        if ($vaildHtml !== true) throw new Exception($vaildHtml['data']);
+        $this->validateHtml($html['data']);
         if ($html['code'] !== self::CODE_SUCCESS) throw new Exception('获取评教课程详情失败');
         return $this->formatEvaluateCourseDetail($html['data']);
     }
@@ -193,13 +179,13 @@ class EvaluateTeacher extends Base
     public function formatEvaluateCourseDetail(string $html): array
     {
         preg_match('/课程名称：(.*?)评教大类/', $html, $courseName);
-        $courseName = $courseName[1] ? $this->stripHtmlTagAndBlankspace($courseName[1]) : '';                   // 课程名称
+        $courseName = $courseName[1] ? $this->stripHtmlTagAndBlankspace($courseName[1]) : ''; // 课程名称
 
         preg_match('/评教大类：(.+)/', $html, $evaluateCategory);
         $evaluateCategory = $evaluateCategory[1] ? $this->stripHtmlTagAndBlankspace($evaluateCategory[1]) : ''; // 评教大类
 
         preg_match('/总评分: (\d+)/', $html, $score);
-        $score = $score[1] ? $this->stripHtmlTagAndBlankspace($score[1]) : '';                                  // 总评分
+        $score = $score[1] ? $this->stripHtmlTagAndBlankspace($score[1]) : ''; // 总评分
 
         preg_match('/<form.*?<\/form>/s', $html, $formHtml); // form表单
         $formHtml = $formHtml[0] ?? '';
@@ -213,7 +199,7 @@ class EvaluateTeacher extends Base
         if (count($paramNames) !== count($paramValues)) throw new Exception('评教参数获取不匹配');
         $params = [];
         foreach ($paramNames as $index => $paramName) {
-            $params[] = [ 'name' => $paramName, 'value' => $paramValues[$index] ];
+            $params[] = ['name' => $paramName, 'value' => $paramValues[$index]];
         }
 
         preg_match('/<table.+?<\/table>/s', $formHtml, $tableHtml);
@@ -264,7 +250,6 @@ class EvaluateTeacher extends Base
                 preg_match('/value="(.*?)"/', $inputs[1], $hiddenValue);
                 $hiddenValue = $hiddenValue[1] ?? '';
 
-
                 $options[] = [
                     'text' => $text,
                     'radio' => [
@@ -288,7 +273,6 @@ class EvaluateTeacher extends Base
                 'options' => $options
             ];
             $form[] = $description;
-
         }
 
         return [
@@ -299,5 +283,4 @@ class EvaluateTeacher extends Base
             'form' => $form
         ];
     }
-
 }
